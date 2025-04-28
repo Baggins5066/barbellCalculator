@@ -11,8 +11,23 @@
       margin: 0;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      position: relative;
+    }
+    #settingsButton {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: none;
+      border: none;
+      font-size: 30px;
+      cursor: pointer;
+      color: #6b7280;
+      z-index: 1000;
+    }
+    #settingsButton:hover {
+      color: #374151;
     }
     .container {
       background: white;
@@ -22,10 +37,15 @@
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       animation: fadeIn 1s ease;
+      margin-top: 80px;
       position: relative;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideFade {
+      from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     h1 {
@@ -76,23 +96,10 @@
       margin-top: 5px;
       border-radius: 6px;
     }
-    #settingsButton {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #6b7280;
-    }
-    #settingsButton:hover {
-      color: #374151;
-    }
     .settingsMenu {
       position: absolute;
       top: 70px;
-      right: 20px;
+      right: 30px;
       background: white;
       border: 1px solid #ccc;
       border-radius: 12px;
@@ -100,7 +107,8 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       width: 300px;
       display: none;
-      animation: fadeIn 0.3s ease;
+      animation: slideFade 0.3s ease;
+      z-index: 1000;
     }
     .inventory-item {
       display: flex;
@@ -111,32 +119,52 @@
     .inventory-item span {
       font-weight: bold;
     }
+    .plate-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .delete-button {
+      background: #ef4444;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+    .delete-button:hover {
+      background: #dc2626;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Barbell Plate Calculator</h1>
 
-    <button id="settingsButton" onclick="toggleSettings()">⚙️</button>
+  <button id="settingsButton" onclick="toggleSettings()">⚙️</button>
 
-    <div id="settingsMenu" class="settingsMenu">
-      <h3>Options</h3>
-      <select id="barbellSelect">
-        <option value="45">Standard Bar (45 lbs)</option>
-        <option value="35">Women's Bar (35 lbs)</option>
-        <option value="15">Training Bar (15 lbs)</option>
-      </select>
+  <div id="settingsMenu" class="settingsMenu">
+    <h3>Options</h3>
+    <select id="barbellSelect">
+      <option value="45">Standard Bar (45 lbs)</option>
+      <option value="35">Women's Bar (35 lbs)</option>
+      <option value="15">Training Bar (15 lbs)</option>
+    </select>
 
-      <div class="inventory">
-        <h4>Available Plates</h4>
-        <div id="plateList"></div>
+    <div class="inventory">
+      <h4>Available Plates</h4>
+      <div id="plateList"></div>
 
-        <div class="inventory-item">
-          <input type="number" id="newPlateInput" placeholder="Plate weight">
-          <button class="small-button" onclick="addPlate()">+</button>
-        </div>
+      <div class="inventory-item">
+        <input type="number" id="newPlateInput" placeholder="Plate weight">
+        <button class="small-button" onclick="addPlate()">+</button>
       </div>
     </div>
+  </div>
+
+  <div class="container">
+    <h1>Barbell Plate Calculator</h1>
 
     <input type="number" id="weightInput" placeholder="Enter target weight (lbs)">
     <button onclick="calculatePlates()">Calculate Plates</button>
@@ -163,14 +191,20 @@
       }
     }
 
+    function removePlate(index) {
+      availablePlates.splice(index, 1);
+      updatePlateList();
+    }
+
     function updatePlateList() {
       const plateList = document.getElementById('plateList');
       plateList.innerHTML = '';
       availablePlates.sort((a, b) => b - a);
 
-      availablePlates.forEach(plate => {
+      availablePlates.forEach((plate, index) => {
         const div = document.createElement('div');
-        div.innerHTML = `<span>${plate} lb</span>`;
+        div.className = 'plate-entry';
+        div.innerHTML = `<span>${plate} lb</span> <button class="delete-button" onclick="removePlate(${index})">&times;</button>`;
         plateList.appendChild(div);
       });
     }
