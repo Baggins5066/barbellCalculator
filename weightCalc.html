@@ -4,140 +4,33 @@
   <meta charset="UTF-8">
   <title>Barbell Plate Calculator</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-      padding: 30px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      position: relative;
-    }
-    #settingsButton {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      background: none;
-      border: none;
-      font-size: 30px;
-      cursor: pointer;
-      color: #6b7280;
-      z-index: 1000;
-    }
-    #settingsButton:hover {
-      color: #374151;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      max-width: 500px;
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      animation: fadeIn 1s ease;
-      margin-top: 80px;
-      position: relative;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideFade {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-      text-align: center;
-      color: #334e68;
-    }
-    input, button, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-    }
-    button {
-      background: #3b82f6;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #2563eb;
-    }
-    .small-button {
-      width: auto;
-      padding: 8px 12px;
-      background: #10b981;
-      margin-top: 0;
-    }
-    .small-button:hover {
-      background: #059669;
-    }
-    .plates, .inventory {
-      margin-top: 25px;
-      animation: fadeIn 1.2s ease;
-    }
-    .plates div {
-      background: #e0f2fe;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-    }
-    .settingsMenu {
-      position: absolute;
-      top: 70px;
-      right: 30px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      width: 300px;
-      display: none;
-      animation: slideFade 0.3s ease;
-      z-index: 1000;
-    }
-    .inventory-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 5px;
-    }
-    .inventory-item span {
-      font-weight: bold;
-    }
-    .plate-entry {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5px 0;
-    }
-    .delete-button {
-      background: #ef4444;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-    }
-    .delete-button:hover {
-      background: #dc2626;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f0f4f8, #d9e2ec); padding: 30px; margin: 0; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; position: relative; }
+    #settingsButton { position: absolute; top: 20px; right: 30px; background: none; border: none; font-size: 30px; cursor: pointer; color: #6b7280; z-index: 1000; }
+    #settingsButton:hover { color: #374151; }
+    .container { background: white; padding: 30px; max-width: 500px; width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); animation: fadeIn 1s ease; margin-top: 80px; position: relative; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: 28px; margin-bottom: 20px; text-align: center; color: #334e68; }
+    input, button, select { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; transition: all 0.3s ease; }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+    button { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
+    button:hover { background: #2563eb; }
+    .small-button { width: auto; padding: 8px 12px; background: #10b981; margin-top: 0; }
+    .small-button:hover { background: #059669; }
+    .plates, .inventory { margin-top: 25px; animation: fadeIn 1.2s ease; }
+    .plates div { background: #e0f2fe; padding: 10px; margin-top: 5px; border-radius: 6px; }
+    .settingsMenu { position: absolute; top: 70px; right: 30px; background: white; border: 1px solid #ccc; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 300px; display: none; animation: slideDown 0.3s ease; z-index: 1000; }
+    .inventory-item { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+    .inventory-item span { font-weight: bold; margin-right: auto; }
+    .adjust-button { background: #10b981; border: none; width: 32px; height: 32px; border-radius: 6px; color: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .adjust-button:hover { background: #059669; }
+    .decrease-button { background: #ef4444; }
+    .decrease-button:hover { background: #dc2626; }
+    .reset-button { background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 8px; margin-top: 10px; width: 100%; cursor: pointer; }
+    .reset-button:hover { background: #d97706; }
+    .barbell-visual { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+    .bar { width: 200px; height: 10px; background: #555; margin: 0 10px; }
+    .plate-visual { height: 50px; background: #3b82f6; margin: 0 2px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -157,9 +50,11 @@
       <div id="plateList"></div>
 
       <div class="inventory-item">
-        <input type="number" id="newPlateInput" placeholder="Plate weight">
+        <input type="number" id="newPlateInput" placeholder="Add something else">
         <button class="small-button" onclick="addPlate()">+</button>
       </div>
+
+      <button class="reset-button" onclick="resetPlates()">Reset Plates</button>
     </div>
   </div>
 
@@ -170,10 +65,18 @@
     <button onclick="calculatePlates()">Calculate Plates</button>
 
     <div class="plates" id="platesOutput"></div>
+    <div class="barbell-visual" id="barbellVisual"></div>
   </div>
 
   <script>
-    let availablePlates = [];
+    let availablePlates = [
+      { weight: 45, count: 4 },
+      { weight: 35, count: 2 },
+      { weight: 25, count: 2 },
+      { weight: 10, count: 4 },
+      { weight: 5, count: 4 },
+      { weight: 2.5, count: 2 }
+    ];
 
     function toggleSettings() {
       const settings = document.getElementById('settingsMenu');
@@ -185,26 +88,52 @@
       const plateValue = Number(newPlateInput.value);
 
       if (plateValue > 0) {
-        availablePlates.push(plateValue);
+        let existing = availablePlates.find(p => p.weight === plateValue);
+        if (existing) {
+          existing.count++;
+        } else {
+          availablePlates.push({ weight: plateValue, count: 1 });
+        }
         updatePlateList();
         newPlateInput.value = '';
       }
     }
 
-    function removePlate(index) {
-      availablePlates.splice(index, 1);
+    function increasePlate(index) {
+      availablePlates[index].count++;
+      updatePlateList();
+    }
+
+    function decreasePlate(index) {
+      if (availablePlates[index].count > 1) {
+        availablePlates[index].count--;
+      } else {
+        availablePlates.splice(index, 1);
+      }
+      updatePlateList();
+    }
+
+    function resetPlates() {
+      availablePlates = [
+        { weight: 45, count: 4 },
+        { weight: 35, count: 2 },
+        { weight: 25, count: 2 },
+        { weight: 10, count: 4 },
+        { weight: 5, count: 4 },
+        { weight: 2.5, count: 2 }
+      ];
       updatePlateList();
     }
 
     function updatePlateList() {
       const plateList = document.getElementById('plateList');
       plateList.innerHTML = '';
-      availablePlates.sort((a, b) => b - a);
+      availablePlates.sort((a, b) => b.weight - a.weight);
 
       availablePlates.forEach((plate, index) => {
         const div = document.createElement('div');
-        div.className = 'plate-entry';
-        div.innerHTML = `<span>${plate} lb</span> <button class="delete-button" onclick="removePlate(${index})">&times;</button>`;
+        div.className = 'inventory-item';
+        div.innerHTML = `<span>${plate.weight} lb (x${plate.count})</span> <button class='adjust-button decrease-button' onclick='decreasePlate(${index})'>-</button> <button class='adjust-button' onclick='increasePlate(${index})'>+</button>`;
         plateList.appendChild(div);
       });
     }
@@ -213,35 +142,65 @@
       const targetWeight = Number(document.getElementById('weightInput').value);
       const barbellWeight = Number(document.getElementById('barbellSelect').value);
       const output = document.getElementById('platesOutput');
+      const visual = document.getElementById('barbellVisual');
 
       output.innerHTML = '';
+      visual.innerHTML = '';
 
       if (availablePlates.length === 0) {
         output.innerHTML = '<div>⚠️ Add plates to the inventory first.</div>';
         return;
       }
 
-      let remaining = (targetWeight - barbellWeight) / 2;
+      let remaining = targetWeight - barbellWeight;
       if (remaining < 0) {
         output.innerHTML = '<div>⚠️ Target weight must be greater than bar weight.</div>';
         return;
       }
 
       const result = [];
+      const visualPlates = [];
       for (let plate of availablePlates) {
-        let count = Math.floor(remaining / plate);
-        if (count > 0) {
-          result.push(`<div>${count} × ${plate} lb plate</div>`);
-          remaining -= count * plate;
+        let maxPairs = Math.floor(plate.count / 2);
+        let neededPairs = Math.floor(remaining / (plate.weight * 2));
+        let usePairs = Math.min(maxPairs, neededPairs);
+
+        if (usePairs > 0) {
+          result.push(`<div>${usePairs} × pair(s) of ${plate.weight} lb plates</div>`);
+          for (let i = 0; i < usePairs; i++) {
+            visualPlates.push(plate.weight);
+          }
+          remaining -= usePairs * plate.weight * 2;
         }
       }
 
-      if (remaining > 0.01) {
+      if (remaining > 0.5) {
         result.push('<div>⚠️ Remaining weight cannot be matched exactly with available plates.</div>');
       }
 
       output.innerHTML = result.join('');
+
+      visualPlates.reverse().forEach(weight => {
+        const plate = document.createElement('div');
+        plate.className = 'plate-visual';
+        plate.style.width = (20 + weight / 2) + 'px';
+        visual.appendChild(plate);
+      });
+
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      visual.appendChild(bar);
+
+      visualPlates.forEach(weight => {
+        const plate = document.createElement('div');
+        plate.className = 'plate-visual';
+        plate.style.width = (20 + weight / 2) + 'px';
+        visual.appendChild(plate);
+      });
     }
+
+    // Initialize list on load
+    updatePlateList();
   </script>
 </body>
 </html>
