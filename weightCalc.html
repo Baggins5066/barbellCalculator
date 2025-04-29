@@ -160,15 +160,15 @@ function calculatePlates() {
     let usePairs = Math.min(maxPairs, neededPairs);
     if (usePairs > 0) {
       const plateGroup = document.createElement('div');
-plateGroup.style.display = 'flex';
-for (let i = 0; i < usePairs * 2; i++) {
-  const plateImage = document.createElement('div');
-  plateImage.className = 'plate-visual';
-  plateImage.style.width = (20 + plate.weight / 2) + 'px';
-  plateImage.innerText = plate.weight;
-  plateGroup.appendChild(plateImage);
-}
-result.push(plateGroup.outerHTML);
+      plateGroup.style.display = 'flex';
+      for (let i = 0; i < usePairs * 2; i++) {
+        const plateImage = document.createElement('div');
+        plateImage.className = 'plate-visual';
+        plateImage.style.width = (20 + plate.weight / 2) + 'px';
+        plateImage.innerText = plate.weight;
+        plateGroup.appendChild(plateImage);
+      }
+      result.push(`<div style="padding: 10px; background: #e0f7fa; border-radius: 8px; margin-top: 10px; font-weight: bold; color: #00796b;">Load ${usePairs * 2} plates of ${plate.weight} lbs</div>`);
       for (let i = 0; i < usePairs; i++) {
         visualPlates.push(plate.weight);
       }
@@ -177,7 +177,7 @@ result.push(plateGroup.outerHTML);
   }
 
   if (remaining > 0.5) {
-    result.push('<div>⚠️ Remaining weight cannot be matched exactly with available plates.</div>');
+    result.push('<div style="padding: 10px; background: #ffebee; border-radius: 8px; margin-top: 10px; font-weight: bold; color: #b71c1c;">⚠️ Remaining weight cannot be matched exactly with available plates.</div>');
   }
 
   const leftSide = [...visualPlates];
