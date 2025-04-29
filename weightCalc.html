@@ -9,7 +9,6 @@
     #settingsButton:hover { color: #374151; }
     .container { background: white; padding: 30px; max-width: 500px; width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); animation: fadeIn 1s ease; margin-top: 80px; position: relative; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     h1 { font-size: 28px; margin-bottom: 20px; text-align: center; color: #334e68; }
     input, button, select { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; transition: all 0.3s ease; }
     input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
@@ -28,179 +27,187 @@
     .decrease-button:hover { background: #dc2626; }
     .reset-button { background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 8px; margin-top: 10px; width: 100%; cursor: pointer; }
     .reset-button:hover { background: #d97706; }
-    .barbell-visual { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
-    .bar { width: 200px; height: 10px; background: #555; margin: 0 10px; }
-    .plate-visual { height: 50px; background: #3b82f6; margin: 0 2px; border-radius: 4px; }
+    .barbell-visual { display: flex; align-items: center; justify-content: center; margin-top: 20px; flex-wrap: nowrap; }
+    .plate-visual { position: relative; height: 50px; background: #3b82f6; margin: 0 2px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
+    .bar { width: 200px; height: 10px; background: #555; margin: 0 10px; flex-shrink: 0; }
   </style>
 </head>
 <body>
 
+<div class="container">
   <button id="settingsButton" onclick="toggleSettings()">⚙️</button>
-
   <div id="settingsMenu" class="settingsMenu">
     <h3>Options</h3>
-    <select id="barbellSelect">
+    <select id="barbellSelect" onchange="calculatePlates()">
       <option value="45">Standard Bar (45 lbs)</option>
       <option value="35">Women's Bar (35 lbs)</option>
       <option value="15">Training Bar (15 lbs)</option>
     </select>
-
     <div class="inventory">
       <h4>Available Plates</h4>
       <div id="plateList"></div>
-
       <div class="inventory-item">
-        <input type="number" id="newPlateInput" placeholder="Add something else">
+        <input type="number" id="newPlateInput" placeholder="Plate weight">
         <button class="small-button" onclick="addPlate()">+</button>
       </div>
-
       <button class="reset-button" onclick="resetPlates()">Reset Plates</button>
     </div>
   </div>
 
-  <div class="container">
-    <h1>Barbell Plate Calculator</h1>
+  <h1>Barbell Plate Calculator</h1>
+  <input type="number" id="weightInput" placeholder="Enter target weight (lbs)" oninput="calculatePlates()">
+  <div class="barbell-visual" id="barbellVisual"></div>
+  <div class="plates" id="platesOutput"></div>
+</div>
 
-    <input type="number" id="weightInput" placeholder="Enter target weight (lbs)">
-    <button onclick="calculatePlates()">Calculate Plates</button>
+<script>
+let availablePlates = [
+  { weight: 45, count: 4 },
+  { weight: 35, count: 2 },
+  { weight: 25, count: 2 },
+  { weight: 10, count: 4 },
+  { weight: 5, count: 4 },
+  { weight: 2.5, count: 2 }
+];
 
-    <div class="plates" id="platesOutput"></div>
-    <div class="barbell-visual" id="barbellVisual"></div>
-  </div>
+function toggleSettings() {
+  const settings = document.getElementById('settingsMenu');
+  settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
+}
 
-  <script>
-    let availablePlates = [
-      { weight: 45, count: 4 },
-      { weight: 35, count: 2 },
-      { weight: 25, count: 2 },
-      { weight: 10, count: 4 },
-      { weight: 5, count: 4 },
-      { weight: 2.5, count: 2 }
-    ];
-
-    function toggleSettings() {
-      const settings = document.getElementById('settingsMenu');
-      settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
+function addPlate() {
+  const newPlateInput = document.getElementById('newPlateInput');
+  const plateValue = Number(newPlateInput.value);
+  if (plateValue > 0) {
+    let existing = availablePlates.find(p => p.weight === plateValue);
+    if (existing) {
+      existing.count++;
+    } else {
+      availablePlates.push({ weight: plateValue, count: 1 });
     }
-
-    function addPlate() {
-      const newPlateInput = document.getElementById('newPlateInput');
-      const plateValue = Number(newPlateInput.value);
-
-      if (plateValue > 0) {
-        let existing = availablePlates.find(p => p.weight === plateValue);
-        if (existing) {
-          existing.count++;
-        } else {
-          availablePlates.push({ weight: plateValue, count: 1 });
-        }
-        updatePlateList();
-        newPlateInput.value = '';
-      }
-    }
-
-    function increasePlate(index) {
-      availablePlates[index].count++;
-      updatePlateList();
-    }
-
-    function decreasePlate(index) {
-      if (availablePlates[index].count > 1) {
-        availablePlates[index].count--;
-      } else {
-        availablePlates.splice(index, 1);
-      }
-      updatePlateList();
-    }
-
-    function resetPlates() {
-      availablePlates = [
-        { weight: 45, count: 4 },
-        { weight: 35, count: 2 },
-        { weight: 25, count: 2 },
-        { weight: 10, count: 4 },
-        { weight: 5, count: 4 },
-        { weight: 2.5, count: 2 }
-      ];
-      updatePlateList();
-    }
-
-    function updatePlateList() {
-      const plateList = document.getElementById('plateList');
-      plateList.innerHTML = '';
-      availablePlates.sort((a, b) => b.weight - a.weight);
-
-      availablePlates.forEach((plate, index) => {
-        const div = document.createElement('div');
-        div.className = 'inventory-item';
-        div.innerHTML = `<span>${plate.weight} lb (x${plate.count})</span> <button class='adjust-button decrease-button' onclick='decreasePlate(${index})'>-</button> <button class='adjust-button' onclick='increasePlate(${index})'>+</button>`;
-        plateList.appendChild(div);
-      });
-    }
-
-    function calculatePlates() {
-      const targetWeight = Number(document.getElementById('weightInput').value);
-      const barbellWeight = Number(document.getElementById('barbellSelect').value);
-      const output = document.getElementById('platesOutput');
-      const visual = document.getElementById('barbellVisual');
-
-      output.innerHTML = '';
-      visual.innerHTML = '';
-
-      if (availablePlates.length === 0) {
-        output.innerHTML = '<div>⚠️ Add plates to the inventory first.</div>';
-        return;
-      }
-
-      let remaining = targetWeight - barbellWeight;
-      if (remaining < 0) {
-        output.innerHTML = '<div>⚠️ Target weight must be greater than bar weight.</div>';
-        return;
-      }
-
-      const result = [];
-      const visualPlates = [];
-      for (let plate of availablePlates) {
-        let maxPairs = Math.floor(plate.count / 2);
-        let neededPairs = Math.floor(remaining / (plate.weight * 2));
-        let usePairs = Math.min(maxPairs, neededPairs);
-
-        if (usePairs > 0) {
-          result.push(`<div>${usePairs} × pair(s) of ${plate.weight} lb plates</div>`);
-          for (let i = 0; i < usePairs; i++) {
-            visualPlates.push(plate.weight);
-          }
-          remaining -= usePairs * plate.weight * 2;
-        }
-      }
-
-      if (remaining > 0.5) {
-        result.push('<div>⚠️ Remaining weight cannot be matched exactly with available plates.</div>');
-      }
-
-      output.innerHTML = result.join('');
-
-      visualPlates.reverse().forEach(weight => {
-        const plate = document.createElement('div');
-        plate.className = 'plate-visual';
-        plate.style.width = (20 + weight / 2) + 'px';
-        visual.appendChild(plate);
-      });
-
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      visual.appendChild(bar);
-
-      visualPlates.forEach(weight => {
-        const plate = document.createElement('div');
-        plate.className = 'plate-visual';
-        plate.style.width = (20 + weight / 2) + 'px';
-        visual.appendChild(plate);
-      });
-    }
-
-    // Initialize list on load
     updatePlateList();
-  </script>
+    newPlateInput.value = '';
+    calculatePlates();
+  }
+}
+
+function increasePlate(index) {
+  availablePlates[index].count++;
+  updatePlateList();
+  calculatePlates();
+}
+
+function decreasePlate(index) {
+  if (availablePlates[index].count > 1) {
+    availablePlates[index].count--;
+  } else {
+    availablePlates.splice(index, 1);
+  }
+  updatePlateList();
+  calculatePlates();
+}
+
+function resetPlates() {
+  availablePlates = [
+    { weight: 45, count: 4 },
+    { weight: 35, count: 2 },
+    { weight: 25, count: 2 },
+    { weight: 10, count: 4 },
+    { weight: 5, count: 4 },
+    { weight: 2.5, count: 2 }
+  ];
+  updatePlateList();
+  calculatePlates();
+}
+
+function updatePlateList() {
+  const plateList = document.getElementById('plateList');
+  plateList.innerHTML = '';
+  availablePlates.sort((a, b) => b.weight - a.weight);
+  availablePlates.forEach((plate, index) => {
+    const div = document.createElement('div');
+    div.className = 'inventory-item';
+    div.innerHTML = `<span>${plate.weight} lb (x${plate.count})</span> <button class='adjust-button decrease-button' onclick='decreasePlate(${index})'>-</button> <button class='adjust-button' onclick='increasePlate(${index})'>+</button>`;
+    plateList.appendChild(div);
+  });
+}
+
+function calculatePlates() {
+  const targetWeight = Number(document.getElementById('weightInput').value);
+  const barbellWeight = Number(document.getElementById('barbellSelect').value);
+  const output = document.getElementById('platesOutput');
+  const visual = document.getElementById('barbellVisual');
+
+  output.innerHTML = '';
+  visual.innerHTML = '';
+
+  if (availablePlates.length === 0) {
+    output.innerHTML = '<div>⚠️ Add plates to the inventory first.</div>';
+    return;
+  }
+
+  let remaining = targetWeight - barbellWeight;
+  if (remaining < 0) {
+    output.innerHTML = '<div>⚠️ Target weight must be greater than bar weight.</div>';
+    return;
+  }
+
+  const result = [];
+  const visualPlates = [];
+  for (let plate of availablePlates) {
+    let maxPairs = Math.floor(plate.count / 2);
+    let neededPairs = Math.floor(remaining / (plate.weight * 2));
+    let usePairs = Math.min(maxPairs, neededPairs);
+    if (usePairs > 0) {
+      const plateGroup = document.createElement('div');
+plateGroup.style.display = 'flex';
+for (let i = 0; i < usePairs * 2; i++) {
+  const plateImage = document.createElement('div');
+  plateImage.className = 'plate-visual';
+  plateImage.style.width = (20 + plate.weight / 2) + 'px';
+  plateImage.innerText = plate.weight;
+  plateGroup.appendChild(plateImage);
+}
+result.push(plateGroup.outerHTML);
+      for (let i = 0; i < usePairs; i++) {
+        visualPlates.push(plate.weight);
+      }
+      remaining -= usePairs * plate.weight * 2;
+    }
+  }
+
+  if (remaining > 0.5) {
+    result.push('<div>⚠️ Remaining weight cannot be matched exactly with available plates.</div>');
+  }
+
+  const leftSide = [...visualPlates];
+  const rightSide = [...visualPlates];
+
+  leftSide.reverse().forEach(weight => {
+    const plate = document.createElement('div');
+    plate.className = 'plate-visual';
+    plate.style.width = (20 + weight / 2) + 'px';
+    plate.innerText = weight;
+    visual.appendChild(plate);
+  });
+
+  const bar = document.createElement('div');
+  bar.className = 'bar';
+  visual.appendChild(bar);
+
+  rightSide.forEach(weight => {
+    const plate = document.createElement('div');
+    plate.className = 'plate-visual';
+    plate.style.width = (20 + weight / 2) + 'px';
+    plate.innerText = weight;
+    visual.appendChild(plate);
+  });
+
+  output.innerHTML = result.join('');
+}
+
+updatePlateList();
+</script>
+
 </body>
 </html>
