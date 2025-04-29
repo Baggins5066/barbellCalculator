@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Barbell Plate Calculator</title>
+  <title>Barbell Calculator</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -213,12 +213,24 @@
       max-width: 400px;
       width: 90%;
     }
+    #weightInput {
+      font-size: 36px; /* Make the font size large */
+      font-weight: bold; /* Make the text bold */
+      text-align: center; /* Center the text */
+      border: 2px solid #3b82f6; /* Add a thicker border */
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); /* Add a subtle shadow */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add smooth transitions */
+    }
+    #weightInput:focus {
+      transform: scale(1.05); /* Slightly enlarge on focus */
+      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5); /* Enhance shadow on focus */
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Barbell Plate Calculator</h1>
+  <h1>Barbell Calculator</h1>
 </header>
 
 <div class="main">
