@@ -79,9 +79,11 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease; /* Add smooth transitions */
     }
     button:hover {
       background: #2563eb;
+      transform: scale(1.05); /* Slightly enlarge buttons on hover */
     }
     .barbell-visual {
       display: flex;
@@ -102,6 +104,11 @@
       color: white;
       font-size: 12px;
       font-weight: bold;
+      transition: transform 0.3s ease, background 0.3s ease; /* Add smooth animations */
+    }
+    .plate-visual:hover {
+      transform: scale(1.1); /* Slightly enlarge plates on hover */
+      background: #2563eb; /* Change color on hover */
     }
     .bar {
       width: 200px;
@@ -194,6 +201,13 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth fade-in and slide-in */
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    .overlay[style*="display: flex"] {
+      opacity: 1;
+      transform: translateY(0);
     }
     .overlay .card {
       max-width: 400px;
@@ -209,8 +223,8 @@
 
 <div class="main">
   <div style="display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 20px; width: 100%; max-width: 800px;">
-    <button class="small-button" style="padding: 10px 15px; font-size: 18px;" onclick="toggleOverlay('settingsOverlay')">🏋️</button>
     <button class="small-button" style="padding: 10px 15px; font-size: 18px;" onclick="toggleOverlay('inventoryOverlay')">🎒</button>
+    <button class="small-button" style="padding: 10px 15px; font-size: 18px;" onclick="toggleOverlay('settingsOverlay')">⚙️</button>
   </div>
 
   <div id="settingsOverlay" class="overlay">
