@@ -348,7 +348,7 @@
         <input type="number" id="newPlateInput" placeholder="Add another">
         <button class="small-button" onclick="addPlate()">Add</button>
       </div>
-      <button class="reset-button" onclick="resetPlates()">Clear Inventory</button>
+      <div class="reset-button" onclick="resetPlates()">Clear Inventory</div>
       <button class="small-button" style="margin-top: 20px;" onclick="toggleOverlay('inventoryOverlay')">Close</button>
     </div>
   </div>
@@ -356,6 +356,13 @@
   <div class="card">
     <h2>Target Weight</h2>
     <input type="number" id="weightInput" placeholder="Enter target weight (lbs)" value="45" oninput="calculatePlates()">
+    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+      <button class="small-button" onclick="adjustWeight(-90)">-90</button>
+      <button class="small-button" onclick="adjustWeight(-5)">-5</button>
+      <button class="small-button" onclick="resetToBarWeight()">Reset</button>
+      <button class="small-button" onclick="adjustWeight(5)">+5</button>
+      <button class="small-button" onclick="adjustWeight(90)">+90</button>
+    </div>
   </div>
 
   <div class="card">
@@ -525,9 +532,30 @@ function toggleDarkMode() {
 // Ensure dark mode toggle reflects the current state on page load
 document.addEventListener('DOMContentLoaded', () => {
   const darkModeToggle = document.getElementById('darkModeToggle');
-  darkModeToggle.checked = document.body.classList.contains('dark-mode');
+  document.body.classList.add('dark-mode'); // Enable dark mode by default
+  document.querySelectorAll('.card').forEach(card => card.classList.add('dark-mode'));
+  document.querySelectorAll('input, select, button').forEach(el => el.classList.add('dark-mode'));
+  document.querySelector('header').classList.add('dark-mode');
+  document.querySelector('footer').classList.add('dark-mode');
+  document.querySelectorAll('.overlay').forEach(overlay => overlay.classList.add('dark-mode'));
+  document.querySelectorAll('.plate-visual').forEach(plate => plate.classList.add('dark-mode'));
+  darkModeToggle.checked = true; // Ensure the toggle reflects the default state
 });
+
+function adjustWeight(amount) {
+  const weightInput = document.getElementById('weightInput');
+  const newWeight = Math.max(0, Number(weightInput.value) + amount); // Ensure weight doesn't go below 0
+  weightInput.value = newWeight;
+  calculatePlates();
+}
+
+function resetToBarWeight() {
+  const barbellWeight = Number(document.getElementById('barbellSelect').value);
+  document.getElementById('weightInput').value = barbellWeight;
+  calculatePlates();
+}
 </script>
 
 </body>
 </html>
+`
