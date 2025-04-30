@@ -225,6 +225,86 @@
       transform: scale(1.05); /* Slightly enlarge on focus */
       box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5); /* Enhance shadow on focus */
     }
+    /* Dark mode styles */
+    body.dark-mode {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #e5e7eb;
+    }
+    header.dark-mode {
+      background: #1e40af;
+    }
+    .card.dark-mode {
+      background: #1e293b;
+      color: #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    }
+    input.dark-mode, select.dark-mode, button.dark-mode {
+      background: #374151;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+    }
+    input.dark-mode:focus, select.dark-mode:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+    }
+    button.dark-mode {
+      background: #2563eb;
+    }
+    button.dark-mode:hover {
+      background: #1d4ed8;
+    }
+    footer.dark-mode {
+      background: #1f2937;
+      color: #9ca3af;
+    }
+    .overlay.dark-mode {
+      background: rgba(0, 0, 0, 0.8);
+    }
+    .plate-visual.dark-mode {
+      background: #2563eb;
+    }
+    .plate-visual.dark-mode:hover {
+      background: #1d4ed8;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #3b82f6;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
   </style>
 </head>
 <body>
@@ -247,6 +327,13 @@
         <option value="35">Women's Bar (35 lbs)</option>
         <option value="15">Training Bar (15 lbs)</option>
       </select>
+      <label style="display: flex; align-items: center; margin-top: 20px;">
+        <span style="margin-right: 10px;">Dark Mode</span>
+        <div class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+          <span class="slider"></span>
+        </div>
+      </label>
       <button class="small-button" style="margin-top: 20px;" onclick="toggleOverlay('settingsOverlay'); calculatePlates();">Apply</button>
     </div>
   </div>
@@ -423,6 +510,23 @@ function resetPlates() {
   updatePlateList();
   calculatePlates();
 }
+
+function toggleDarkMode() {
+  const isDarkMode = document.getElementById('darkModeToggle').checked;
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode', isDarkMode));
+  document.querySelectorAll('input, select, button').forEach(el => el.classList.toggle('dark-mode', isDarkMode));
+  document.querySelector('header').classList.toggle('dark-mode', isDarkMode);
+  document.querySelector('footer').classList.toggle('dark-mode', isDarkMode);
+  document.querySelectorAll('.overlay').forEach(overlay => overlay.classList.toggle('dark-mode', isDarkMode));
+  document.querySelectorAll('.plate-visual').forEach(plate => plate.classList.toggle('dark-mode', isDarkMode));
+}
+
+// Ensure dark mode toggle reflects the current state on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  darkModeToggle.checked = document.body.classList.contains('dark-mode');
+});
 </script>
 
 </body>
