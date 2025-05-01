@@ -1,136 +1,256 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(WeightCalcApp());
-}
+void main() => runApp(BarbellCalculatorApp());
 
-class WeightCalcApp extends StatelessWidget {
-  const WeightCalcApp({super.key});
-
+class BarbellCalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Barbell Calculator',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
-      home: WeightCalcHome(),
+      themeMode: ThemeMode.dark,
+      home: BarbellHomePage(),
     );
   }
 }
 
-class WeightCalcHome extends StatefulWidget {
-  const WeightCalcHome({super.key});
-
+class BarbellHomePage extends StatefulWidget {
   @override
-  _WeightCalcHomeState createState() => _WeightCalcHomeState();
+  _BarbellHomePageState createState() => _BarbellHomePageState();
 }
 
-class _WeightCalcHomeState extends State<WeightCalcHome> {
-  final List<Map<String, dynamic>> availablePlates = [
-    {'weight': 45, 'count': 4},
-    {'weight': 35, 'count': 2},
-    {'weight': 25, 'count': 2},
-    {'weight': 10, 'count': 4},
-    {'weight': 5, 'count': 4},
+class _BarbellHomePageState extends State<BarbellHomePage> {
+  double targetWeight = 45;
+  double barWeight = 45;
+  bool darkMode = true;
+  final TextEditingController newPlateController = TextEditingController();
+  List<Map<String, dynamic>> plates = [
+    {'weight': 45.0, 'count': 4},
+    {'weight': 35.0, 'count': 2},
+    {'weight': 25.0, 'count': 2},
+    {'weight': 10.0, 'count': 4},
+    {'weight': 5.0, 'count': 4},
     {'weight': 2.5, 'count': 2},
   ];
 
-  double targetWeight = 45;
-  double barbellWeight = 45;
-  bool isDarkMode = false;
-
-  void calculatePlates() {
-    // Logic to calculate plates based on targetWeight and barbellWeight
-    // ...existing code...
-  }
-
-  void adjustWeight(double amount) {
-    setState(() {
-      targetWeight = (targetWeight + amount).clamp(0, double.infinity);
-      calculatePlates();
-    });
+  void adjustWeight(double delta) {
+    setState(() => targetWeight = (targetWeight + delta).clamp(0, 1000));
   }
 
   void resetToBarWeight() {
+    setState(() => targetWeight = barWeight);
+  }
+
+  void addPlate(double weight) {
+    final existing = plates.firstWhere(
+      (p) => p['weight'] == weight,
+      orElse: () => {},
+    );
     setState(() {
-      targetWeight = barbellWeight;
-      calculatePlates();
+      if (existing.isNotEmpty) {
+        existing['count']++;
+      } else {
+        plates.add({'weight': weight, 'count': 1});
+      }
     });
   }
 
-  void toggleDarkMode(bool value) {
+  void increasePlate(int index) {
+    setState(() => plates[index]['count']++);
+  }
+
+  void decreasePlate(int index) {
     setState(() {
-      isDarkMode = value;
+      if (plates[index]['count'] > 1) {
+        plates[index]['count']--;
+      } else {
+        plates.removeAt(index);
+      }
     });
+  }
+
+  void clearInventory() {
+    setState(() => plates.clear());
+  }
+
+  List<double> calculatePlateConfiguration() {
+    double remaining = targetWeight - barWeight;
+    if (remaining < 0) return [];
+    List<double> visualPlates = [];
+    final sorted = [...plates]..sort((a, b) => b['weight'].compareTo(a['weight']));
+    for (final plate in sorted) {
+      int maxPairs = plate['count'] ~/ 2;
+      int neededPairs = (remaining / (plate['weight'] * 2)).floor();
+      int usePairs = neededPairs.clamp(0, maxPairs);
+      for (int i = 0; i < usePairs; i++) {
+        visualPlates.add(plate['weight']);
+      }
+      remaining -= usePairs * plate['weight'] * 2;
+    }
+    return visualPlates;
   }
 
   @override
   Widget build(BuildContext context) {
+    final plateVisuals = calculatePlateConfiguration();
     return Scaffold(
       appBar: AppBar(
         title: Text('Barbell Calculator'),
         actions: [
-          Switch(
-            value: isDarkMode,
-            onChanged: toggleDarkMode,
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              builder: (_) => buildSettingsSheet(),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.inventory),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              builder: (_) => buildInventorySheet(),
+            ),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: [
-            DropdownButton<double>(
-              value: barbellWeight,
-              items: [
-                DropdownMenuItem(value: 45, child: Text('Standard Bar (45 lbs)')),
-                DropdownMenuItem(value: 35, child: Text('Women\'s Bar (35 lbs)')),
-                DropdownMenuItem(value: 15, child: Text('Training Bar (15 lbs)')),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  barbellWeight = value!;
-                  calculatePlates();
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Target Weight (lbs)',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  targetWeight = double.tryParse(value) ?? 0;
-                  calculatePlates();
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(onPressed: () => adjustWeight(-90), child: Text('-90')),
-                ElevatedButton(onPressed: () => adjustWeight(-5), child: Text('-5')),
-                ElevatedButton(onPressed: resetToBarWeight, child: Text('Reset')),
-                ElevatedButton(onPressed: () => adjustWeight(5), child: Text('+5')),
-                ElevatedButton(onPressed: () => adjustWeight(90), child: Text('+90')),
-              ],
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'Results will be displayed here',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
+            buildTargetWeightInput(),
+            buildBarbellVisual(plateVisuals),
           ],
         ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(child: Text('Made by Jasper Pell')),
+      ),
+    );
+  }
+
+  Widget buildTargetWeightInput() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text('Target Weight', style: Theme.of(context).textTheme.titleLarge),
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(hintText: 'Enter weight (lbs)'),
+              onChanged: (val) => setState(() => targetWeight = double.tryParse(val) ?? 0),
+              controller: TextEditingController(text: targetWeight.toString()),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (final val in [-90, -5, 0, 5, 90])
+                  ElevatedButton(
+                    onPressed: () =>
+                        val == 0 ? resetToBarWeight() : adjustWeight(val.toDouble()),
+                    child: Text(val == 0 ? 'Reset' : (val > 0 ? '+$val' : '$val')),
+                  ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildBarbellVisual(List<double> plates) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text('Results', style: Theme.of(context).textTheme.titleLarge),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ...plates.reversed.map(buildPlate),
+                Container(width: 100, height: 10, color: Colors.grey),
+                ...plates.map(buildPlate),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildPlate(double weight) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 2),
+      width: 20 + weight / 2,
+      height: 50,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        weight.toString(),
+        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget buildSettingsSheet() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButton<double>(
+            value: barWeight,
+            onChanged: (val) => setState(() => barWeight = val ?? 45),
+            items: [45.0, 35.0, 15.0].map((e) => DropdownMenuItem(value: e, child: Text('$e lbs'))).toList(),
+          ),
+          SwitchListTile(
+            title: Text('Dark Mode'),
+            value: darkMode,
+            onChanged: (val) => setState(() => darkMode = val),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildInventorySheet() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...plates.asMap().entries.map((entry) {
+            final i = entry.key;
+            final plate = entry.value;
+            return ListTile(
+              title: Text('${plate['weight']} lbs (x${plate['count']})'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(onPressed: () => decreasePlate(i), icon: Icon(Icons.remove, color: Colors.red)),
+                  IconButton(onPressed: () => increasePlate(i), icon: Icon(Icons.add, color: Colors.green)),
+                ],
+              ),
+            );
+          }),
+          TextField(
+            controller: newPlateController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: 'Add plate (lbs)'),
+            onSubmitted: (val) => addPlate(double.tryParse(val) ?? 0),
+          ),
+          ElevatedButton(
+            onPressed: clearInventory,
+            child: Text('Clear Inventory'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          )
+        ],
       ),
     );
   }
