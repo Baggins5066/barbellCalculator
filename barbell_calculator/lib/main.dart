@@ -69,10 +69,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
 
   Widget buildPlate(double weight) {
     String display = weight % 1 == 0 ? weight.toInt().toString() : weight.toString();
+    double plateHeight = 50 + (weight / 45) * 100; // Base height of 50, scales with weight
+    double plateWidth = 20 + weight / 2; // Scales width with weight
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
-      width: 20 + weight / 2,
-      height: 150,
+      width: plateWidth,
+      height: plateHeight,
       decoration: BoxDecoration(
         color: Colors.blue,
         borderRadius: BorderRadius.circular(4),
