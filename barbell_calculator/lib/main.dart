@@ -89,8 +89,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text('Barbell Setup', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 10),
+              buildBarbellDiagram(),
+              const Spacer(),
               TextField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
@@ -114,10 +117,6 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                   ElevatedButton(onPressed: () => _adjustWeight(90), child: const Text('+90')),
                 ],
               ),
-              const SizedBox(height: 40),
-              Text('Barbell Setup', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 10),
-              buildBarbellDiagram(),
             ],
           ),
         ),
