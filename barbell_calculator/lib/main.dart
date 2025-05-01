@@ -60,7 +60,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
       children: [
         ...plates.reversed.map((w) => buildPlate(w)),
         Expanded(
-          child: Container(height: 30, color: Colors.grey),
+          child: Container(height: 15, color: Colors.grey), // Reduced height from 30 to 15
         ),
         ...plates.map((w) => buildPlate(w)),
       ],
@@ -97,25 +97,67 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Plate Inventory'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text('45 lb plates: 4'),
-                      Text('35 lb plates: 2'),
-                      Text('25 lb plates: 2'),
-                      Text('10 lb plates: 4'),
-                      Text('5 lb plates: 4'),
-                      Text('2.5 lb plates: 2'),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Close'),
-                    ),
-                  ],
+                builder: (context) => StatefulBuilder(
+                  builder: (context, setState) {
+                    Map<int, int> plateInventory = {
+                      45: 4,
+                      35: 2,
+                      25: 2,
+                      10: 4,
+                      5: 4,
+                       2: 2, // Representing 2.5 lb plates as 2 for integer storage
+                    };
+
+                    return AlertDialog(
+                      title: const Text('Plate Inventory'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: plateInventory.entries.map((entry) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${entry.key == 2 ? 2.5 : entry.key} lb plates:', // Convert 2 back to 2.5 for display
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      setState(() {
+                                        if (plateInventory[entry.key]! > 0) {
+                                          plateInventory[entry.key] = plateInventory[entry.key]! - 1;
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    '${plateInventory[entry.key]}',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      setState(() {
+                                        plateInventory[entry.key] = plateInventory[entry.key]! + 1;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               );
             },
