@@ -89,6 +89,39 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Barbell Calculator'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.backpack),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Plate Inventory'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('45 lb plates: 4'),
+                      Text('35 lb plates: 2'),
+                      Text('25 lb plates: 2'),
+                      Text('10 lb plates: 4'),
+                      Text('5 lb plates: 4'),
+                      Text('2.5 lb plates: 2'),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
