@@ -40,15 +40,40 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     });
   }
 
+  void _validateAndSetWeight(String value) {
+    final newValue = double.tryParse(value);
+    if (newValue != null && newValue >= barWeight) {
+      setState(() => weight = newValue);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid weight. Please enter a valid number greater than or equal to the bar weight.')),
+      );
+      _controller.text = weight.toStringAsFixed(0);
+    }
+  }
+
   List<double> getPlatesNeeded() {
     double remainder = weight - barWeight;
-    List<double> availablePlates = [45, 35, 25, 10, 5, 2.5];
+    Map<double, int> plateInventory = {
+      45: 4,
+      35: 2,
+      25: 2,
+      10: 4,
+      5: 4,
+      2.5: 2,
+    };
     List<double> usedPlates = [];
-    for (double plate in availablePlates) {
-      while (remainder >= plate * 2) {
+    for (double plate in plateInventory.keys) {
+      while (remainder >= plate * 2 && plateInventory[plate]! > 0) {
         usedPlates.add(plate);
         remainder -= plate * 2;
+        plateInventory[plate] = plateInventory[plate]! - 1;
       }
+    }
+    if (remainder > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Target weight cannot be achieved with available plates.')),
+      );
     }
     return usedPlates;
   }
@@ -99,13 +124,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                 context: context,
                 builder: (context) => StatefulBuilder(
                   builder: (context, setState) {
-                    Map<int, int> plateInventory = {
+                    final Map<int, int> plateInventory = {
                       45: 4,
                       35: 2,
                       25: 2,
                       10: 4,
                       5: 4,
-                       2: 2, // Representing 2.5 lb plates as 2 for integer storage
+                      2: 2, // Representing 2.5 lb plates as 2 for integer storage
                     };
 
                     return AlertDialog(
@@ -181,12 +206,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                onChanged: (value) {
-                  final newValue = double.tryParse(value);
-                  if (newValue != null) {
-                    setState(() => weight = newValue);
-                  }
-                },
+                onChanged: _validateAndSetWeight,
               ),
               const SizedBox(height: 24),
               Row(
