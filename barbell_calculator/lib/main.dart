@@ -56,10 +56,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   Widget buildBarbellDiagram() {
     List<double> plates = getPlatesNeeded();
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         ...plates.reversed.map((w) => buildPlate(w)),
-        Container(width: 100, height: 10, color: Colors.grey),
+        Expanded(
+          child: Container(height: 30, color: Colors.grey),
+        ),
         ...plates.map((w) => buildPlate(w)),
       ],
     );
@@ -70,7 +72,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       width: 20 + weight / 2,
-      height: 50,
+      height: 150,
       decoration: BoxDecoration(
         color: Colors.blue,
         borderRadius: BorderRadius.circular(4),
@@ -92,8 +94,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
             children: [
               Text('Barbell Setup', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 10),
-              buildBarbellDiagram(),
-              const Spacer(),
+              Expanded(
+                child: Center(
+                  child: buildBarbellDiagram(),
+                ),
+              ),
               TextField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
@@ -123,4 +128,4 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
       ),
     );
   }
-} 
+}
