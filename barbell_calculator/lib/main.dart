@@ -5,6 +5,8 @@ void main() {
 }
 
 class WeightCalcApp extends StatelessWidget {
+  const WeightCalcApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +20,8 @@ class WeightCalcApp extends StatelessWidget {
 }
 
 class WeightCalcHome extends StatefulWidget {
+  const WeightCalcHome({super.key});
+
   @override
   _WeightCalcHomeState createState() => _WeightCalcHomeState();
 }
