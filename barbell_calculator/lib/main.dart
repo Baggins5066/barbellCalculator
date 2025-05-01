@@ -66,6 +66,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   }
 
   Widget buildPlate(double weight) {
+    String display = weight % 1 == 0 ? weight.toInt().toString() : weight.toString();
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       width: 20 + weight / 2,
@@ -75,8 +76,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         borderRadius: BorderRadius.circular(4),
       ),
       alignment: Alignment.center,
-      child: Text(
-        '$weight',
+      child: Text(display,
         style: const TextStyle(color: Colors.white, fontSize: 12),
       ),
     );
