@@ -195,60 +195,86 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           IconButton(
             icon: const Icon(Icons.backpack),
             onPressed: () {
+              Map<int, int> plateInventory = {
+                45: 4,
+                35: 2,
+                25: 2,
+                10: 4,
+                5: 4,
+                2: 2, // Representing 2.5 lb plates as 2 for integer storage
+              };
+
+              final Map<int, int> defaultInventory = Map.from(plateInventory); // Save default state
+
               showDialog(
                 context: context,
                 builder: (context) => StatefulBuilder(
                   builder: (context, setState) {
-                    final Map<int, int> plateInventory = {
-                      45: 4,
-                      35: 2,
-                      25: 2,
-                      10: 4,
-                      5: 4,
-                      2: 2, // Representing 2.5 lb plates as 2 for integer storage
-                    };
-
                     return AlertDialog(
                       title: const Text('Plate Inventory'),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: plateInventory.entries.map((entry) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ...plateInventory.entries.map((entry) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${entry.key == 2 ? 2.5 : entry.key} lb plates:', // Convert 2 back to 2.5 for display
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (plateInventory[entry.key]! > 0) {
+                                            plateInventory[entry.key] = plateInventory[entry.key]! - 1;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Text(
+                                      '${plateInventory[entry.key]}',
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: () {
+                                        setState(() {
+                                          plateInventory[entry.key] = plateInventory[entry.key]! + 1;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(
-                                '${entry.key == 2 ? 2.5 : entry.key} lb plates:', // Convert 2 back to 2.5 for display
-                                style: const TextStyle(fontSize: 18),
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    plateInventory = Map.from(defaultInventory); // Reset to default state
+                                  });
+                                },
+                                child: const Text('Reset'),
                               ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () {
-                                      setState(() {
-                                        if (plateInventory[entry.key]! > 0) {
-                                          plateInventory[entry.key] = plateInventory[entry.key]! - 1;
-                                        }
-                                      });
-                                    },
-                                  ),
-                                  Text(
-                                    '${plateInventory[entry.key]}',
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () {
-                                      setState(() {
-                                        plateInventory[entry.key] = plateInventory[entry.key]! + 1;
-                                      });
-                                    },
-                                  ),
-                                ],
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    plateInventory.updateAll((key, value) => 0); // Clear all plates
+                                  });
+                                },
+                                child: const Text('Clear All'),
                               ),
                             ],
-                          );
-                        }).toList(),
+                          ),
+                        ],
                       ),
                       actions: [
                         TextButton(
