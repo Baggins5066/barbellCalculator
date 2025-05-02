@@ -122,7 +122,19 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: null, // Removed the "Barbell Calculator" text
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/logo.png', // Path to your logo image
+              height: 40, // Adjust the height as needed
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error), // Fallback in case of missing image
+            ),
+            const SizedBox(width: 10),
+            const Text('Barbell Calculator'), // Optional text next to the logo
+          ],
+        ),
+        centerTitle: true, // Centers the title in the AppBar
         leading: IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
