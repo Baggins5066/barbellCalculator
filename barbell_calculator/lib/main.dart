@@ -88,21 +88,27 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   Widget buildBarbellDiagram() {
     List<double> plates = getPlatesNeeded();
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        ...plates.reversed.map((w) => buildPlate(w)),
-        Expanded(
-          child: Container(height: 15, color: Colors.grey), // Reduced height from 30 to 15
+        Container(
+          width: 30, // Fixed width for the bar
+          height: 30, // Square shape for the bar
+          color: Colors.grey, // Barbell shaft
         ),
-        ...plates.map((w) => buildPlate(w)),
+        ...plates.map((w) => buildPlate(w)), // Show right side weights
+        Container(
+          width: 10, // Short bar sticking out beyond the weights
+          height: 30,
+          color: Colors.grey,
+        ),
       ],
     );
   }
 
   Widget buildPlate(double weight) {
     String display = weight % 1 == 0 ? weight.toInt().toString() : weight.toString();
-    double plateHeight = 50 + (weight / 45) * 100; // Base height of 50, scales with weight
-    double plateWidth = 20 + weight / 2; // Scales width with weight
+    double plateHeight = 70 + (weight / 45) * 140; // Larger height for plates
+    double plateWidth = 30 + weight / 2; // Larger width for plates
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       width: plateWidth,
@@ -112,7 +118,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         borderRadius: BorderRadius.circular(4),
       ),
       alignment: Alignment.center,
-      child: Text(display,
+      child: Text(
+        display,
         style: const TextStyle(color: Colors.white, fontSize: 12),
       ),
     );
