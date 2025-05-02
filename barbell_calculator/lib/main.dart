@@ -90,10 +90,19 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Container(
-          width: 30, // Fixed width for the bar
-          height: 30, // Square shape for the bar
-          color: Colors.grey, // Barbell shaft
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 30, // Fixed width for the bar
+              height: 30, // Square shape for the bar
+              color: Colors.grey, // Barbell shaft
+            ),
+            Text(
+              '${barWeight.toStringAsFixed(0)}', // Display the bar's weight
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+          ],
         ),
         ...plates.map((w) => buildPlate(w)), // Show right side weights
         Container(
@@ -147,29 +156,36 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
             showDialog(
               context: context,
               builder: (context) {
-                return AlertDialog(
-                  title: const Text('Settings'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return AlertDialog(
+                      title: const Text('Settings'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Dark Mode'),
-                          Switch(
-                            value: isDarkMode,
-                            onChanged: _toggleDarkMode,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Dark Mode'),
+                              Switch(
+                                value: isDarkMode,
+                                onChanged: (value) {
+                                  setState(() => isDarkMode = value); // Update local state
+                                  _toggleDarkMode(value); // Update global state
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Close'),
-                    ),
-                  ],
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             );
