@@ -131,7 +131,6 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               errorBuilder: (context, error, stackTrace) => const Icon(Icons.error), // Fallback in case of missing image
             ),
             const SizedBox(width: 10),
-            const Text('Barbell Calculator'), // Optional text next to the logo
           ],
         ),
         centerTitle: true, // Centers the title in the AppBar
