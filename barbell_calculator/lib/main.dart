@@ -122,7 +122,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Barbell Calculator'),
+        title: null, // Removed the "Barbell Calculator" text
         leading: IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
