@@ -25,6 +25,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   double weight = 45;
   final double barWeight = 45;
   final TextEditingController _controller = TextEditingController(text: '45');
+  bool isDarkMode = false;
+
+  void _toggleDarkMode(bool value) {
+    setState(() {
+      isDarkMode = value;
+    });
+  }
 
   void _adjustWeight(double amount) {
     setState(() {
@@ -116,6 +123,40 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Barbell Calculator'),
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Settings'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Dark Mode'),
+                          Switch(
+                            value: isDarkMode,
+                            onChanged: _toggleDarkMode,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.backpack),
@@ -223,6 +264,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           ),
         ),
       ),
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
     );
   }
 }
