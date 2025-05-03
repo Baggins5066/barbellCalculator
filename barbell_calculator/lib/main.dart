@@ -7,9 +7,42 @@ class BarbellCalculatorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BarbellCalculatorHome(),
+      theme: ThemeData(
+        brightness: Brightness.dark, // Dark theme
+        primaryColor: Colors.grey[900], // Dark grey as main color
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF212121), // Dark grey
+          secondary: Colors.blue, // Accent color
+        ),
+        scaffoldBackgroundColor: Colors.grey[900], // Dark grey background
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF212121), // Dark grey AppBar background
+          foregroundColor: Colors.blue, // AppBar text/icon color
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue, // Button background
+            foregroundColor: Colors.white, // Button text color
+          ),
+        ),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.white), // Default text color
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFF212121), // Dark grey fill color
+          border: OutlineInputBorder(),
+          labelStyle: TextStyle(color: Colors.blue), // Label color
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.all(Colors.blue), // Switch thumb color
+          trackColor: MaterialStateProperty.all(Colors.blue.withOpacity(0.5)), // Switch track color
+        ),
+      ),
+      home: const BarbellCalculatorHome(),
     );
   }
 }
@@ -25,7 +58,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   double weight = 45;
   final double barWeight = 45;
   final TextEditingController _controller = TextEditingController(text: '45');
-  bool isDarkMode = false;
+  bool isDarkMode = true; // Dark mode enabled by default
 
   void _toggleDarkMode(bool value) {
     setState(() {
@@ -378,7 +411,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           ),
         ),
       ),
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: Colors.grey[900], // Set to dark grey
     );
   }
 }
