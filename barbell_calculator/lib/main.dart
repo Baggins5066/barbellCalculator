@@ -56,7 +56,7 @@ class BarbellCalculatorHome extends StatefulWidget {
 
 class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   double weight = 45;
-  final double barWeight = 45;
+  double barWeight = 45;
   final TextEditingController _controller = TextEditingController(text: '45');
   bool isDarkMode = true; // Dark mode enabled by default
 
@@ -100,8 +100,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
 
   void _resetWeight() {
     setState(() {
-      weight = 45;
-      _controller.text = '45';
+      weight = barWeight; // Reset target weight to barbell weight
+      _controller.text = barWeight.toStringAsFixed(0);
     });
   }
 
@@ -257,6 +257,59 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           iconSize: 40, // Increased button size
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.fitness_center, size: 30), // Icon for barbell weight
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  final TextEditingController barWeightController = TextEditingController(text: barWeight.toString());
+                  return AlertDialog(
+                    title: const Text('Set Barbell Weight'),
+                    content: TextField(
+                      controller: barWeightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Barbell Weight',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          final newBarWeight = double.tryParse(barWeightController.text);
+                          if (newBarWeight != null && newBarWeight > 0) {
+                            setState(() {
+                              barWeight = newBarWeight;
+                              weight = barWeight; // Reset target weight to new bar weight
+                              _controller.text = barWeight.toStringAsFixed(0);
+                            });
+                            Navigator.of(context).pop();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Invalid weight. Please enter a positive number.')),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          'Set',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            iconSize: 40, // Increased button size
+          ),
           IconButton(
             icon: const Icon(Icons.backpack, size: 30), // Increased icon size
             onPressed: () {
