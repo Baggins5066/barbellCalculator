@@ -177,6 +177,135 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     return usedPlates;
   }
 
+  double calculateWeightFromPlates(List<double> selectedPlates) {
+    double totalWeight = barWeight;
+    for (double plate in selectedPlates) {
+      totalWeight += plate * 2; // Each plate is added to both sides of the barbell
+    }
+    return totalWeight;
+  }
+
+  Widget buildPlatesSelection() {
+    Map<double, int> tempInventory = Map.from(plateInventory);
+    List<double> selectedPlates = [];
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Column(
+          children: [
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3, // Display plates in a grid
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                children: tempInventory.entries.map((entry) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (tempInventory[entry.key]! > 0) {
+                          selectedPlates.add(entry.key);
+                          selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
+                        }
+                      });
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/plates/${entry.key.toInt()}lb.png', // Path to plate image
+                          height: 80,
+                          width: 80,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                        ),
+                        Text(
+                          '${entry.key} lb',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 20, // Smaller width for the bar
+                      height: 20, // Smaller square shape for the bar
+                      color: Colors.grey, // Barbell shaft
+                    ),
+                    Text(
+                      '${barWeight.toStringAsFixed(0)}', // Display the bar's weight
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
+                    ),
+                  ],
+                ),
+                ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
+              ],
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  selectedPlates.clear(); // Clear all selected plates
+                });
+              },
+              child: const Text(
+                'Clear All',
+                style: TextStyle(fontSize: 18),
+              ),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(120, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildSmallPlate(double weight) {
+    String display = weight % 1 == 0 ? weight.toInt().toString() : weight.toStringAsFixed(1); // Ensure "2.5" is displayed clearly
+    double plateHeight = 35 + (weight / 45) * 70; // Smaller height for plates
+    double plateWidth = 15 + weight / 4; // Smaller width for plates
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 1),
+      width: plateWidth,
+      height: plateHeight,
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(2),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        display,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: weight == 2.5 ? 14 : 12, // Larger font size for "2.5"
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   Widget buildBarbellDiagram() {
     List<double> plates = getPlatesNeeded();
     return Row(
@@ -618,15 +747,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                     ),
                   ),
               ] else ...[
-                // Placeholder for Plates to Weight mode
                 Expanded(
-                  child: Center(
-                    child: Text(
-                      'Plates to Weight mode is under construction.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                  child: buildPlatesSelection(),
                 ),
               ],
               const SizedBox(height: 20),
