@@ -760,12 +760,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       onPressed: () => _adjustWeight(-90),
                       child: const Text(
                         '-90',
-                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
                     ),
@@ -773,12 +773,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       onPressed: () => _adjustWeight(-5),
                       child: const Text(
                         '-5',
-                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
                     ),
@@ -786,12 +786,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       onPressed: _resetWeight,
                       child: const Text(
                         'Reset',
-                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(90, 50), // Slightly larger for emphasis
+                        minimumSize: const Size(70, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
                     ),
@@ -799,12 +799,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       onPressed: () => _adjustWeight(5),
                       child: const Text(
                         '+5',
-                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
                     ),
@@ -812,12 +812,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       onPressed: () => _adjustWeight(90),
                       child: const Text(
                         '+90',
-                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
                     ),
