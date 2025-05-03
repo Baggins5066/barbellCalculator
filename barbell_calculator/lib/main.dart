@@ -209,7 +209,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.settings),
+          icon: const Icon(Icons.settings, size: 30), // Increased icon size
           onPressed: () {
             showDialog(
               context: context,
@@ -254,10 +254,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               },
             );
           },
+          iconSize: 40, // Increased button size
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.backpack),
+            icon: const Icon(Icons.backpack, size: 30), // Increased icon size
             onPressed: () {
               Map<int, int> plateInventory = {
                 45: 4,
@@ -285,7 +286,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${entry.key == 2 ? 2.5 : entry.key} lb plates:', // Convert 2 back to 2.5 for display
+                                  '${entry.key == 2 ? 2.5 : entry.key}', // Removed colon
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 Row(
@@ -447,6 +448,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                 ),
               );
             },
+            iconSize: 40, // Increased button size
           ),
         ],
       ),
