@@ -63,6 +63,31 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   void _toggleDarkMode(bool value) {
     setState(() {
       isDarkMode = value;
+      if (isDarkMode) {
+        // Apply dark mode colors
+        Theme.of(context).copyWith(
+          scaffoldBackgroundColor: Colors.grey[900],
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF212121),
+            foregroundColor: Colors.blue,
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            fillColor: Color(0xFF212121),
+          ),
+        );
+      } else {
+        // Apply light mode colors
+        Theme.of(context).copyWith(
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.blue,
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            fillColor: Colors.white,
+          ),
+        );
+      }
     });
   }
 
@@ -535,7 +560,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           ),
         ),
       ),
-      backgroundColor: Colors.grey[900], // Dark grey background
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white, // Toggle background color
     );
   }
 }
