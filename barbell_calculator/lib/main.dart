@@ -55,11 +55,30 @@ class BarbellCalculatorHome extends StatefulWidget {
 }
 
 class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   double weight = 45;
   double barWeight = 45;
   final TextEditingController _controller = TextEditingController(text: '45');
   bool isDarkMode = true; // Dark mode enabled by default
   bool isWeightToPlates = true; // Default mode is Weight to Plates
+
+  Map<double, int> plateInventory = {
+    45: 4,
+    35: 2,
+    25: 2,
+    10: 4,
+    5: 4,
+    2.5: 2,
+  };
+
+  bool _isWeightAchievable = true; // Flag to track if the target weight is achievable
+  String _errorMessage = ''; // Error message to display when weight is not achievable
+
+  void _applyInventoryChanges(Map<double, int> updatedInventory) {
+    setState(() {
+      plateInventory = Map.from(updatedInventory);
+    });
+  }
 
   void _toggleDarkMode(bool value) {
     setState(() {
@@ -100,7 +119,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
 
   void _adjustWeight(double amount) {
     setState(() {
-      weight = (weight + amount).clamp(0, 1000);
+      weight = (weight + amount).clamp(barWeight, 1000); // Ensure weight does not go below bar weight
       _controller.text = weight.toStringAsFixed(0);
     });
   }
@@ -112,41 +131,49 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     });
   }
 
+  void _showErrorMessage(String message) {
+    _scaffoldMessengerKey.currentState?.clearSnackBars(); // Clear existing SnackBars
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   void _validateAndSetWeight(String value) {
     final newValue = double.tryParse(value);
     if (newValue != null && newValue >= barWeight) {
       setState(() => weight = newValue);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid weight. Please enter a valid number greater than or equal to the bar weight.')),
-      );
+      _showErrorMessage('Invalid weight. Please enter a valid number greater than or equal to the bar weight.');
       _controller.text = weight.toStringAsFixed(0);
     }
   }
 
   List<double> getPlatesNeeded() {
     double remainder = weight - barWeight;
-    Map<double, int> plateInventory = {
-      45: 4,
-      35: 2,
-      25: 2,
-      10: 4,
-      5: 4,
-      2.5: 2,
-    };
+    Map<double, int> tempInventory = Map.from(plateInventory);
     List<double> usedPlates = [];
-    for (double plate in plateInventory.keys) {
-      while (remainder >= plate * 2 && plateInventory[plate]! > 0) {
+
+    for (double plate in tempInventory.keys.toList()..sort((a, b) => b.compareTo(a))) {
+      while (remainder >= plate * 2 && tempInventory[plate]! > 0) {
         usedPlates.add(plate);
         remainder -= plate * 2;
-        plateInventory[plate] = plateInventory[plate]! - 1;
+        tempInventory[plate] = tempInventory[plate]! - 1;
       }
     }
+
     if (remainder > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Target weight cannot be achieved with available plates.')),
-      );
+      setState(() {
+        _isWeightAchievable = false;
+        _errorMessage = 'Target weight cannot be achieved with available plates.';
+      });
+      return [];
     }
+
+    setState(() {
+      _isWeightAchievable = true;
+      _errorMessage = '';
+    });
+
     return usedPlates;
   }
 
@@ -202,6 +229,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldMessengerKey, // Attach the key to the Scaffold
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -247,7 +275,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
                           child: const Text(
-                            'Close',
+                            'Apply',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
                           ),
                           style: TextButton.styleFrom(
@@ -300,9 +328,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                             });
                             Navigator.of(context).pop();
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid weight. Please enter a positive number.')),
-                            );
+                            _showErrorMessage('Invalid weight. Please enter a positive number.');
                           }
                         },
                         child: const Text(
@@ -320,16 +346,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           IconButton(
             icon: const Icon(Icons.backpack, size: 30), // Increased icon size
             onPressed: () {
-              Map<int, int> plateInventory = {
+              Map<double, int> tempInventory = Map.from(plateInventory); // Temporary inventory for dialog
+              final Map<double, int> defaultInventory = {
                 45: 4,
                 35: 2,
                 25: 2,
                 10: 4,
                 5: 4,
-                2: 2, // Representing 2.5 lb plates as 2 for integer storage
-              };
-
-              final Map<int, int> defaultInventory = Map.from(plateInventory); // Save default state
+                2.5: 2,
+              }; // Default inventory
 
               showDialog(
                 context: context,
@@ -341,12 +366,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ...plateInventory.entries.where((entry) => entry.value > 0).map((entry) {
+                          ...tempInventory.entries.where((entry) => entry.value > 0).map((entry) {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${entry.key == 2 ? 2.5 : entry.key}', // Removed colon
+                                  '${entry.key == 2.5 ? 2.5 : entry.key}', // Display plate weight
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 Row(
@@ -355,24 +380,24 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                       icon: const Icon(Icons.remove),
                                       onPressed: () {
                                         setState(() {
-                                          if (plateInventory[entry.key]! > 0) {
-                                            plateInventory[entry.key] = plateInventory[entry.key]! - 1;
-                                            if (plateInventory[entry.key] == 0) {
-                                              plateInventory.remove(entry.key); // Remove plate when count reaches 0
+                                          if (tempInventory[entry.key]! > 0) {
+                                            tempInventory[entry.key] = tempInventory[entry.key]! - 1;
+                                            if (tempInventory[entry.key] == 0) {
+                                              tempInventory.remove(entry.key); // Remove plate when count reaches 0
                                             }
                                           }
                                         });
                                       },
                                     ),
                                     Text(
-                                      '${plateInventory[entry.key]}',
+                                      '${tempInventory[entry.key]}',
                                       style: const TextStyle(fontSize: 18),
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.add),
                                       onPressed: () {
                                         setState(() {
-                                          plateInventory[entry.key] = plateInventory[entry.key]! + 1;
+                                          tempInventory[entry.key] = tempInventory[entry.key]! + 1;
                                         });
                                       },
                                     ),
@@ -400,13 +425,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                   final customWeight = double.tryParse(customWeightController.text);
                                   if (customWeight != null && customWeight > 0) {
                                     setState(() {
-                                      plateInventory[customWeight.toInt()] = (plateInventory[customWeight.toInt()] ?? 0) + 1;
+                                      tempInventory[customWeight] = (tempInventory[customWeight] ?? 0) + 1;
                                     });
                                     customWeightController.clear();
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Invalid weight. Please enter a positive number.')),
-                                    );
+                                    _showErrorMessage('Invalid weight. Please enter a positive number.');
                                   }
                                 },
                                 style: IconButton.styleFrom(
@@ -434,25 +457,19 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                           onPressed: () => Navigator.of(context).pop(), // Close dialog
                                           child: const Text(
                                             'Cancel',
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
-                                          ),
-                                          style: TextButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                                           ),
                                         ),
                                         TextButton(
                                           onPressed: () {
                                             setState(() {
-                                              plateInventory = Map.from(defaultInventory); // Reset to default state
+                                              tempInventory = Map.from(defaultInventory); // Reset to default inventory
                                             });
                                             Navigator.of(context).pop(); // Close dialog
                                           },
                                           child: const Text(
                                             'Confirm',
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
-                                          ),
-                                          style: TextButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                                           ),
                                         ),
                                       ],
@@ -461,29 +478,54 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                 },
                                 child: const Text(
                                   'Reset',
-                                  style: TextStyle(fontSize: 20, color: Colors.white), // White text
+                                  style: TextStyle(fontSize: 16),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size(90, 50), // Slightly larger for emphasis
+                                  minimumSize: const Size(120, 40),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                  setState(() {
-                                    plateInventory.updateAll((key, value) => 0); // Clear all plates
-                                  });
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Clear All'),
+                                      content: const Text('Are you sure you want to remove all plates from the inventory?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(), // Close dialog
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              tempInventory.clear(); // Remove all plates
+                                            });
+                                            Navigator.of(context).pop(); // Close dialog
+                                          },
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: const Text(
                                   'Clear All',
-                                  style: TextStyle(fontSize: 20, color: Colors.white), // White text
+                                  style: TextStyle(fontSize: 16),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size(90, 50), // Ideal size for mobile
+                                  minimumSize: const Size(120, 40),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
@@ -493,9 +535,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       ),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: () {
+                            _applyInventoryChanges(tempInventory); // Apply changes to the main inventory
+                            Navigator.of(context).pop();
+                          },
                           child: const Text(
-                            'Close',
+                            'Apply',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
                           ),
                           style: TextButton.styleFrom(
@@ -549,7 +594,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                   controller: _controller,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: _isWeightAchievable ? Colors.white : Colors.red, // Red text if weight is not achievable
+                  ),
                   decoration: InputDecoration(
                     labelText: 'Enter Weight',
                     labelStyle: const TextStyle(color: Colors.blue),
@@ -559,6 +608,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                   ),
                   onChanged: _validateAndSetWeight,
                 ),
+                if (!_isWeightAchievable) // Show error message if weight is not achievable
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
               ] else ...[
                 // Placeholder for Plates to Weight mode
                 Expanded(
