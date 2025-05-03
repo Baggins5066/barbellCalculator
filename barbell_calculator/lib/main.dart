@@ -59,6 +59,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
   double barWeight = 45;
   final TextEditingController _controller = TextEditingController(text: '45');
   bool isDarkMode = true; // Dark mode enabled by default
+  bool isWeightToPlates = true; // Default mode is Weight to Plates
 
   void _toggleDarkMode(bool value) {
     setState(() {
@@ -88,6 +89,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           ),
         );
       }
+    });
+  }
+
+  void _toggleMode() {
+    setState(() {
+      isWeightToPlates = !isWeightToPlates;
     });
   }
 
@@ -511,106 +518,131 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Barbell Setup',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: Center(
-                  child: buildBarbellDiagram(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _controller,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Enter Weight',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onChanged: _validateAndSetWeight,
-              ),
-              const SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () => _adjustWeight(-90),
-                    child: const Text(
-                      '-90',
-                      style: TextStyle(fontSize: 20), // Larger font size for better readability
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(70, 50), // Ideal size for mobile
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
+                    onPressed: _toggleMode,
+                    tooltip: isWeightToPlates ? 'Switch to Plates to Weight' : 'Switch to Weight to Plates',
                   ),
-                  ElevatedButton(
-                    onPressed: () => _adjustWeight(-5),
-                    child: const Text(
-                      '-5',
-                      style: TextStyle(fontSize: 20), // Larger font size for better readability
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(70, 50), // Ideal size for mobile
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _resetWeight,
-                    child: const Text(
-                      'Reset',
-                      style: TextStyle(fontSize: 20), // Larger font size for better readability
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(90, 50), // Slightly larger for emphasis
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _adjustWeight(5),
-                    child: const Text(
-                      '+5',
-                      style: TextStyle(fontSize: 20), // Larger font size for better readability
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(70, 50), // Ideal size for mobile
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _adjustWeight(90),
-                    child: const Text(
-                      '+90',
-                      style: TextStyle(fontSize: 20), // Larger font size for better readability
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(70, 50), // Ideal size for mobile
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
-                      ),
-                    ),
+                  const SizedBox(width: 10),
+                  Text(
+                    isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
+              if (isWeightToPlates) ...[
+                Expanded(
+                  child: Center(
+                    child: buildBarbellDiagram(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _controller,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Enter Weight',
+                    labelStyle: const TextStyle(color: Colors.blue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onChanged: _validateAndSetWeight,
+                ),
+              ] else ...[
+                // Placeholder for Plates to Weight mode
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Plates to Weight mode is under construction.',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+              if (isWeightToPlates)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => _adjustWeight(-90),
+                      child: const Text(
+                        '-90',
+                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _adjustWeight(-5),
+                      child: const Text(
+                        '-5',
+                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _resetWeight,
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(90, 50), // Slightly larger for emphasis
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _adjustWeight(5),
+                      child: const Text(
+                        '+5',
+                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _adjustWeight(90),
+                      child: const Text(
+                        '+90',
+                        style: TextStyle(fontSize: 20), // Larger font size for better readability
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(70, 50), // Ideal size for mobile
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
