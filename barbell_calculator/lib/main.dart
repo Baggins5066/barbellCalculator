@@ -176,13 +176,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           children: [
             Image.asset(
               'assets/logo.png', // Path to your logo image
-              height: 40, // Adjust the height as needed
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error), // Fallback in case of missing image
+              height: 40,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
             ),
             const SizedBox(width: 10),
           ],
         ),
-        centerTitle: true, // Centers the title in the AppBar
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
@@ -203,8 +203,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                               Switch(
                                 value: isDarkMode,
                                 onChanged: (value) {
-                                  setState(() => isDarkMode = value); // Update local state
-                                  _toggleDarkMode(value); // Update global state
+                                  setState(() => isDarkMode = value);
+                                  _toggleDarkMode(value);
                                 },
                               ),
                             ],
@@ -214,7 +214,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Close'),
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                          ),
                         ),
                       ],
                     );
@@ -317,6 +323,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                     );
                                   }
                                 },
+                                style: IconButton.styleFrom(
+                                  minimumSize: const Size(50, 50), // Ideal size for mobile
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -334,7 +346,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.of(context).pop(), // Close dialog
-                                          child: const Text('Cancel'),
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
+                                          ),
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed: () {
@@ -343,13 +361,28 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                             });
                                             Navigator.of(context).pop(); // Close dialog
                                           },
-                                          child: const Text('Confirm'),
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
+                                          ),
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                                          ),
                                         ),
                                       ],
                                     ),
                                   );
                                 },
-                                child: const Text('Reset'),
+                                child: const Text(
+                                  'Reset',
+                                  style: TextStyle(fontSize: 20, color: Colors.white), // White text
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(90, 50), // Slightly larger for emphasis
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                                  ),
+                                ),
                               ),
                               ElevatedButton(
                                 onPressed: () {
@@ -357,7 +390,16 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                     plateInventory.updateAll((key, value) => 0); // Clear all plates
                                   });
                                 },
-                                child: const Text('Clear All'),
+                                child: const Text(
+                                  'Clear All',
+                                  style: TextStyle(fontSize: 20, color: Colors.white), // White text
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(90, 50), // Ideal size for mobile
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -366,7 +408,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Close'),
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                          ),
                         ),
                       ],
                     );
@@ -379,39 +427,115 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Barbell Setup', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 10),
+              Text(
+                'Barbell Setup',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
               Expanded(
                 child: Center(
                   child: buildBarbellDiagram(),
                 ),
               ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Enter Weight',
+                  labelStyle: const TextStyle(color: Colors.blue),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 onChanged: _validateAndSetWeight,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(onPressed: () => _adjustWeight(-90), child: const Text('-90')),
-                  ElevatedButton(onPressed: () => _adjustWeight(-5), child: const Text('-5')),
-                  ElevatedButton(onPressed: _resetWeight, child: const Text('Reset')),
-                  ElevatedButton(onPressed: () => _adjustWeight(5), child: const Text('+5')),
-                  ElevatedButton(onPressed: () => _adjustWeight(90), child: const Text('+90')),
+                  ElevatedButton(
+                    onPressed: () => _adjustWeight(-90),
+                    child: const Text(
+                      '-90',
+                      style: TextStyle(fontSize: 20), // Larger font size for better readability
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(70, 50), // Ideal size for mobile
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _adjustWeight(-5),
+                    child: const Text(
+                      '-5',
+                      style: TextStyle(fontSize: 20), // Larger font size for better readability
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(70, 50), // Ideal size for mobile
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _resetWeight,
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(fontSize: 20), // Larger font size for better readability
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(90, 50), // Slightly larger for emphasis
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _adjustWeight(5),
+                    child: const Text(
+                      '+5',
+                      style: TextStyle(fontSize: 20), // Larger font size for better readability
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(70, 50), // Ideal size for mobile
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _adjustWeight(90),
+                    child: const Text(
+                      '+90',
+                      style: TextStyle(fontSize: 20), // Larger font size for better readability
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(70, 50), // Ideal size for mobile
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
         ),
       ),
-      backgroundColor: Colors.grey[900], // Set to dark grey
+      backgroundColor: Colors.grey[900], // Dark grey background
     );
   }
 }
