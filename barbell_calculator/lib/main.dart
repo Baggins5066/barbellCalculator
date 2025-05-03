@@ -210,12 +210,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                 context: context,
                 builder: (context) => StatefulBuilder(
                   builder: (context, setState) {
+                    final TextEditingController customWeightController = TextEditingController();
                     return AlertDialog(
                       title: const Text('Plate Inventory'),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ...plateInventory.entries.map((entry) {
+                          ...plateInventory.entries.where((entry) => entry.value > 0).map((entry) {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -231,6 +232,9 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                         setState(() {
                                           if (plateInventory[entry.key]! > 0) {
                                             plateInventory[entry.key] = plateInventory[entry.key]! - 1;
+                                            if (plateInventory[entry.key] == 0) {
+                                              plateInventory.remove(entry.key); // Remove plate when count reaches 0
+                                            }
                                           }
                                         });
                                       },
@@ -254,13 +258,63 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                           }).toList(),
                           const SizedBox(height: 16),
                           Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: customWeightController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Add another',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  final customWeight = double.tryParse(customWeightController.text);
+                                  if (customWeight != null && customWeight > 0) {
+                                    setState(() {
+                                      plateInventory[customWeight.toInt()] = (plateInventory[customWeight.toInt()] ?? 0) + 1;
+                                    });
+                                    customWeightController.clear();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Invalid weight. Please enter a positive number.')),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               ElevatedButton(
                                 onPressed: () {
-                                  setState(() {
-                                    plateInventory = Map.from(defaultInventory); // Reset to default state
-                                  });
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Reset'),
+                                      content: const Text('Are you sure you want to reset the inventory to its default state?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(), // Close dialog
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              plateInventory = Map.from(defaultInventory); // Reset to default state
+                                            });
+                                            Navigator.of(context).pop(); // Close dialog
+                                          },
+                                          child: const Text('Confirm'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: const Text('Reset'),
                               ),
