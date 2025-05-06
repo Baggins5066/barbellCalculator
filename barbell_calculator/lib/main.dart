@@ -695,19 +695,23 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
+                  ElevatedButton.icon(
                     onPressed: _toggleMode,
-                    tooltip: isWeightToPlates ? 'Switch to Plates to Weight' : 'Switch to Weight to Plates',
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                    textAlign: TextAlign.center,
+                    icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
+                    label: Text(
+                      isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20), // More rounded edges
+                      ),
+                    ),
                   ),
                 ],
               ),
