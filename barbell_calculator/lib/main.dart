@@ -38,8 +38,8 @@ class BarbellCalculatorApp extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.blue), // Label color
         ),
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.all(Colors.blue), // Switch thumb color
-          trackColor: MaterialStateProperty.all(Colors.blue.withOpacity(0.5)), // Switch track color
+          thumbColor: WidgetStateProperty.all(Colors.blue), // Switch thumb color
+          trackColor: WidgetStateProperty.all(Colors.blue.withOpacity(0.5)), // Switch track color
         ),
       ),
       home: const BarbellCalculatorHome(),
@@ -250,7 +250,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       color: Colors.grey, // Barbell shaft
                     ),
                     Text(
-                      '${barWeight.toStringAsFixed(0)}', // Display the bar's weight
+                      barWeight.toStringAsFixed(0), // Display the bar's weight
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
                     ),
                   ],
@@ -265,15 +265,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                   selectedPlates.clear(); // Clear all selected plates
                 });
               },
-              child: const Text(
-                'Clear All',
-                style: TextStyle(fontSize: 18),
-              ),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(120, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+              ),
+              child: const Text(
+                'Clear All',
+                style: TextStyle(fontSize: 18),
               ),
             ),
           ],
@@ -320,7 +320,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               color: Colors.grey, // Barbell shaft
             ),
             Text(
-              '${barWeight.toStringAsFixed(0)}', // Display the bar's weight
+              barWeight.toStringAsFixed(0), // Display the bar's weight
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
             ),
           ],
@@ -403,12 +403,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                          ),
                           child: const Text(
                             'Apply',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
-                          ),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
                           ),
                         ),
                       ],
@@ -534,7 +534,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                 ),
                               ],
                             );
-                          }).toList(),
+                          }),
                           const SizedBox(height: 16),
                           Row(
                             children: [
@@ -605,15 +605,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                     ),
                                   );
                                 },
-                                child: const Text(
-                                  'Reset',
-                                  style: TextStyle(fontSize: 16),
-                                ),
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: const Size(120, 40),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
+                                ),
+                                child: const Text(
+                                  'Reset',
+                                  style: TextStyle(fontSize: 16),
                                 ),
                               ),
                               ElevatedButton(
@@ -647,15 +647,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                                     ),
                                   );
                                 },
-                                child: const Text(
-                                  'Clear All',
-                                  style: TextStyle(fontSize: 16),
-                                ),
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: const Size(120, 40),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
+                                ),
+                                child: const Text(
+                                  'Clear All',
+                                  style: TextStyle(fontSize: 16),
                                 ),
                               ),
                             ],
@@ -668,12 +668,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                             _applyInventoryChanges(tempInventory); // Apply changes to the main inventory
                             Navigator.of(context).pop();
                           },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
+                          ),
                           child: const Text(
                             'Apply',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
-                          ),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
                           ),
                         ),
                       ],
@@ -758,67 +758,67 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                   children: [
                     ElevatedButton(
                       onPressed: () => _adjustWeight(-90),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(60, 40), // Reduced button size
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
+                        ),
+                      ),
                       child: const Text(
                         '-90',
                         style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _adjustWeight(-5),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _adjustWeight(-5),
                       child: const Text(
                         '-5',
                         style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
                     ),
                     ElevatedButton(
                       onPressed: _resetWeight,
-                      child: const Text(
-                        'Reset',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(70, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
                       ),
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () => _adjustWeight(5),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(60, 40), // Reduced button size
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
+                        ),
+                      ),
                       child: const Text(
                         '+5',
                         style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
                     ),
                     ElevatedButton(
                       onPressed: () => _adjustWeight(90),
-                      child: const Text(
-                        '+90',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(60, 40), // Reduced button size
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8), // Slightly smaller corners
                         ),
+                      ),
+                      child: const Text(
+                        '+90',
+                        style: TextStyle(fontSize: 16), // Slightly smaller font size
                       ),
                     ),
                   ],
