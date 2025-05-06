@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
 
 void main() => runApp(const BarbellCalculatorApp());
 
@@ -860,7 +859,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 class AnimatedPlate extends StatelessWidget {
   final double weight;
 
-  const AnimatedPlate({Key? key, required this.weight}) : super(key: key);
+  const AnimatedPlate({super.key, required this.weight});
 
   @override
   Widget build(BuildContext context) {
