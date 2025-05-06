@@ -194,85 +194,92 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         return Column(
           children: [
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 4, // Display 4 buttons per row
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                children: tempInventory.entries.map((entry) {
-                  return GestureDetector(
-                    onTap: () {
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 20, // Smaller width for the bar
+                            height: 20, // Smaller square shape for the bar
+                            color: Colors.grey, // Barbell shaft
+                          ),
+                          Text(
+                            barWeight.toStringAsFixed(0), // Display the bar's weight
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
+                          ),
+                        ],
+                      ),
+                      ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
                       setState(() {
-                        if (tempInventory[entry.key]! > 0) {
-                          selectedPlates.add(entry.key);
-                          selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
-                        }
+                        selectedPlates.clear(); // Clear all selected plates
                       });
                     },
-                    child: Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${entry.key} lb',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(120, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  );
-                }).toList(),
+                    child: const Text(
+                      'Clear All',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 20, // Smaller width for the bar
-                      height: 20, // Smaller square shape for the bar
-                      color: Colors.grey, // Barbell shaft
+            GridView.count(
+              crossAxisCount: 4, // Display 4 buttons per row
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              shrinkWrap: true, // Ensure the grid only takes up necessary space
+              physics: const NeverScrollableScrollPhysics(), // Disable scrolling for the grid
+              children: tempInventory.entries.map((entry) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (tempInventory[entry.key]! > 0) {
+                        selectedPlates.add(entry.key);
+                        selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
+                      }
+                    });
+                  },
+                  child: Container(
+                    height: 80,
+                    width: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
                     ),
-                    Text(
-                      barWeight.toStringAsFixed(0), // Display the bar's weight
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${entry.key} lb',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
-                  ],
-                ),
-                ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
-              ],
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  selectedPlates.clear(); // Clear all selected plates
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(120, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Clear All',
-                style: TextStyle(fontSize: 18),
-              ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         );
