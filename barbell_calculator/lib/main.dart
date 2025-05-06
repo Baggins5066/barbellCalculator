@@ -550,177 +550,184 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                     final TextEditingController customWeightController = TextEditingController();
                     return AlertDialog(
                       title: const Text('Plate Inventory'),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ...tempInventory.entries.where((entry) => entry.value > 0).map((entry) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    '${entry.key == 2.5 ? 2.5 : entry.key}', // Display plate weight
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (tempInventory[entry.key]! > 0) {
-                                              tempInventory[entry.key] = tempInventory[entry.key]! - 1;
-                                              if (tempInventory[entry.key] == 0) {
-                                                tempInventory.remove(entry.key); // Remove plate when count reaches 0
-                                              }
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      Text(
-                                        '${tempInventory[entry.key]}',
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        onPressed: () {
-                                          setState(() {
-                                            tempInventory[entry.key] = tempInventory[entry.key]! + 1;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                                  ...tempInventory.entries.where((entry) => entry.value > 0).map((entry) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '${entry.key == 2.5 ? 2.5 : entry.key}', // Display plate weight
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(Icons.remove),
+                                              onPressed: () {
+                                                setState(() {
+                                                  if (tempInventory[entry.key]! > 0) {
+                                                    tempInventory[entry.key] = tempInventory[entry.key]! - 1;
+                                                    if (tempInventory[entry.key] == 0) {
+                                                      tempInventory.remove(entry.key); // Remove plate when count reaches 0
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            Text(
+                                              '${tempInventory[entry.key]}',
+                                              style: const TextStyle(fontSize: 18),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.add),
+                                              onPressed: () {
+                                                setState(() {
+                                                  tempInventory[entry.key] = tempInventory[entry.key]! + 1;
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  }),
                                 ],
-                              );
-                            }),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: customWeightController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Add another',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: () {
-                                    final customWeight = double.tryParse(customWeightController.text);
-                                    if (customWeight != null && customWeight > 0) {
-                                      setState(() {
-                                        tempInventory[customWeight] = (tempInventory[customWeight] ?? 0) + 1;
-                                      });
-                                      customWeightController.clear();
-                                    } else {
-                                      _showErrorMessage('Invalid weight. Please enter a positive number.');
-                                    }
-                                  },
-                                  style: IconButton.styleFrom(
-                                    minimumSize: const Size(50, 50), // Ideal size for mobile
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12), // Rounded corners
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text('Confirm Reset'),
-                                        content: const Text('Are you sure you want to reset the inventory to its default state?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(), // Close dialog
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                tempInventory = Map.from(defaultInventory); // Reset to default inventory
-                                              });
-                                              Navigator.of(context).pop(); // Close dialog
-                                            },
-                                            child: const Text(
-                                              'Confirm',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(120, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Reset',
-                                    style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: customWeightController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Add another',
+                                    border: OutlineInputBorder(),
                                   ),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text('Confirm Clear All'),
-                                        content: const Text('Are you sure you want to remove all plates from the inventory?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(), // Close dialog
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                tempInventory.clear(); // Remove all plates
-                                              });
-                                              Navigator.of(context).pop(); // Close dialog
-                                            },
-                                            child: const Text(
-                                              'Confirm',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(120, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Clear All',
-                                    style: TextStyle(fontSize: 16),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  final customWeight = double.tryParse(customWeightController.text);
+                                  if (customWeight != null && customWeight > 0) {
+                                    setState(() {
+                                      tempInventory[customWeight] = (tempInventory[customWeight] ?? 0) + 1;
+                                    });
+                                    customWeightController.clear();
+                                  } else {
+                                    _showErrorMessage('Invalid weight. Please enter a positive number.');
+                                  }
+                                },
+                                style: IconButton.styleFrom(
+                                  minimumSize: const Size(50, 50), // Ideal size for mobile
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12), // Rounded corners
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Reset'),
+                                      content: const Text('Are you sure you want to reset the inventory to its default state?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(), // Close dialog
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              tempInventory = Map.from(defaultInventory); // Reset to default inventory
+                                            });
+                                            Navigator.of(context).pop(); // Close dialog
+                                          },
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(120, 40),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Reset',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Clear All'),
+                                      content: const Text('Are you sure you want to remove all plates from the inventory?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(), // Close dialog
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              tempInventory.clear(); // Remove all plates
+                                            });
+                                            Navigator.of(context).pop(); // Close dialog
+                                          },
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(120, 40),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Clear All',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       actions: [
                         TextButton(
