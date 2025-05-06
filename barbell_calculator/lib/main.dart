@@ -193,55 +193,53 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
       builder: (context, setState) {
         return Column(
           children: [
+            const SizedBox(height: 20),
+            Text(
+              'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+            ),
+            const SizedBox(height: 20),
             Expanded(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 20, // Smaller width for the bar
-                            height: 20, // Smaller square shape for the bar
-                            color: Colors.grey, // Barbell shaft
-                          ),
-                          Text(
-                            barWeight.toStringAsFixed(0), // Display the bar's weight
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
-                          ),
-                        ],
-                      ),
-                      ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        selectedPlates.clear(); // Clear all selected plates
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(120, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 20, // Smaller width for the bar
+                          height: 20, // Smaller square shape for the bar
+                          color: Colors.grey, // Barbell shaft
+                        ),
+                        Text(
+                          barWeight.toStringAsFixed(0), // Display the bar's weight
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
+                        ),
+                      ],
                     ),
-                    child: const Text(
-                      'Clear All',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
+                    ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  selectedPlates.clear(); // Clear all selected plates
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(120, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Reset',
+                style: TextStyle(fontSize: 18),
               ),
             ),
             const SizedBox(height: 20),
