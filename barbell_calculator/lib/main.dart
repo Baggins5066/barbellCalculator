@@ -421,11 +421,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/logo.png', // Path to your logo image
-              height: 40,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-            ),
+            // Image.asset(
+            //   'assets/logo.png', // Path to your logo image
+            //   height: 40,
+            //   errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+            // ),
             const SizedBox(width: 10),
           ],
         ),
