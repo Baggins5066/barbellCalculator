@@ -168,12 +168,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   void _validateAndSetWeight(String value) {
     final newValue = double.tryParse(value);
-    if (newValue != null && newValue >= barWeight) {
-      setState(() => weight = newValue);
-    } else {
+    if (newValue == null || newValue < barWeight) {
       _showErrorMessage('Invalid weight. Please enter a valid number greater than or equal to the bar weight.');
       _controller.text = weight.toStringAsFixed(0);
+      return;
     }
+    setState(() => weight = newValue);
   }
 
   void _animateNumberChange() {
@@ -413,6 +413,22 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     );
   }
 
+  ElevatedButton buildElevatedButton({required String label, required VoidCallback onPressed, double fontSize = 16, double minWidth = 60, double minHeight = 40}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(minWidth, minHeight),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: fontSize),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -421,17 +437,13 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Image.asset(
-            //   'assets/logo.png', // Path to your logo image
-            //   height: 40,
-            //   errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-            // ),
             const SizedBox(width: 10),
           ],
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.settings, size: 30), // Increased icon size
+          tooltip: 'Open Settings',
           onPressed: () {
             showDialog(
               context: context,
@@ -481,6 +493,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         actions: [
           IconButton(
             icon: const Icon(Icons.fitness_center, size: 30), // Icon for barbell weight
+            tooltip: 'Set Barbell Weight',
             onPressed: () {
               showDialog(
                 context: context,
@@ -532,6 +545,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
           ),
           IconButton(
             icon: const Icon(Icons.backpack, size: 30), // Increased icon size
+            tooltip: 'Manage Plate Inventory',
             onPressed: () {
               Map<double, int> tempInventory = Map.from(plateInventory); // Temporary inventory for dialog
               final Map<double, int> defaultInventory = {
@@ -827,71 +841,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
-                      onPressed: () => _adjustWeight(-90),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
-                      child: const Text(
-                        '-90',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _adjustWeight(-5),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
-                      child: const Text(
-                        '-5',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _resetWeight,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(70, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
-                      child: const Text(
-                        'Reset',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _adjustWeight(5),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
-                      child: const Text(
-                        '+5',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _adjustWeight(90),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(60, 40), // Reduced button size
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Slightly smaller corners
-                        ),
-                      ),
-                      child: const Text(
-                        '+90',
-                        style: TextStyle(fontSize: 16), // Slightly smaller font size
-                      ),
-                    ),
+                    buildElevatedButton(label: '-90', onPressed: () => _adjustWeight(-90)),
+                    buildElevatedButton(label: '-5', onPressed: () => _adjustWeight(-5)),
+                    buildElevatedButton(label: 'Reset', onPressed: _resetWeight, minWidth: 70),
+                    buildElevatedButton(label: '+5', onPressed: () => _adjustWeight(5)),
+                    buildElevatedButton(label: '+90', onPressed: () => _adjustWeight(90)),
                   ],
                 ),
             ],
