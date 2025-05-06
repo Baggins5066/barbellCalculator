@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Import for setting device orientation
 
-void main() => runApp(const BarbellCalculatorApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Lock to portrait mode
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(const BarbellCalculatorApp());
+  });
+}
 
 class BarbellCalculatorApp extends StatelessWidget {
   const BarbellCalculatorApp({super.key});
