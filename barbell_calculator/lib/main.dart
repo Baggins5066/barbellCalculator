@@ -563,7 +563,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '${entry.key == 2.5 ? 2.5 : entry.key}', // Display plate weight
+                                          entry.key % 1 == 0 ? entry.key.toInt().toString() : entry.key.toStringAsFixed(1), // Display as integer if whole number
                                           style: const TextStyle(fontSize: 18),
                                         ),
                                         Row(
