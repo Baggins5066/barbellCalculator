@@ -195,7 +195,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           children: [
             Expanded(
               child: GridView.count(
-                crossAxisCount: 3, // Display plates in a grid
+                crossAxisCount: 4, // Display 4 buttons per row
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 children: tempInventory.entries.map((entry) {
@@ -208,24 +208,22 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                         }
                       });
                     },
-                    child: Stack(
+                    child: Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
                       alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/plates/${entry.key.toInt()}lb.png', // Path to plate image
-                          height: 80,
-                          width: 80,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                      child: Text(
+                        '${entry.key} lb',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
-                        Text(
-                          '${entry.key} lb',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 }).toList(),
