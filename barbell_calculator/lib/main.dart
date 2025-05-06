@@ -195,8 +195,12 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
           children: [
             const SizedBox(height: 20),
             Text(
-              'Total Weight: ${calculateWeightFromPlates(selectedPlates).toStringAsFixed(1)} lb',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+              calculateWeightFromPlates(selectedPlates).toInt().toString(),
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
             ),
             const SizedBox(height: 20),
             Expanded(
