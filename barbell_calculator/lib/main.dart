@@ -427,7 +427,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               showDialog(
                 context: context,
                 builder: (context) {
-                  final TextEditingController barWeightController = TextEditingController(text: barWeight.toString());
+                  final TextEditingController barWeightController = TextEditingController(text: barWeight.toInt().toString());
                   return AlertDialog(
                     title: const Text('Set Barbell Weight'),
                     content: TextField(
@@ -448,16 +448,16 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       ),
                       TextButton(
                         onPressed: () {
-                          final newBarWeight = double.tryParse(barWeightController.text);
+                          final newBarWeight = int.tryParse(barWeightController.text);
                           if (newBarWeight != null && newBarWeight > 0) {
                             setState(() {
-                              barWeight = newBarWeight;
+                              barWeight = newBarWeight.toDouble();
                               weight = barWeight; // Reset target weight to new bar weight
                               _controller.text = barWeight.toStringAsFixed(0);
                             });
                             Navigator.of(context).pop();
                           } else {
-                            _showErrorMessage('Invalid weight. Please enter a positive number.');
+                            _showErrorMessage('Invalid weight. Please enter a positive integer.');
                           }
                         },
                         child: const Text(
