@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/animation.dart';
 
 void main() => runApp(const BarbellCalculatorApp());
 
@@ -54,7 +55,7 @@ class BarbellCalculatorHome extends StatefulWidget {
   State<BarbellCalculatorHome> createState() => _BarbellCalculatorHomeState();
 }
 
-class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
+class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   double weight = 45;
   double barWeight = 45;
@@ -73,6 +74,33 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
 
   bool _isWeightAchievable = true; // Flag to track if the target weight is achievable
   String _errorMessage = ''; // Error message to display when weight is not achievable
+
+  late AnimationController _numberAnimationController;
+  late Animation<double> _numberAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _numberAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _numberAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(
+      parent: _numberAnimationController,
+      curve: Curves.easeInOut,
+    ));
+    _numberAnimationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _numberAnimationController.reverse();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _numberAnimationController.dispose();
+    super.dispose();
+  }
 
   void _applyInventoryChanges(Map<double, int> updatedInventory) {
     setState(() {
@@ -148,6 +176,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
     }
   }
 
+  void _animateNumberChange() {
+    _numberAnimationController.forward();
+  }
+
   List<double> getPlatesNeeded() {
     double remainder = weight - barWeight;
     Map<double, int> tempInventory = Map.from(plateInventory);
@@ -194,13 +226,21 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         return Column(
           children: [
             const SizedBox(height: 20),
-            Text(
-              calculateWeightFromPlates(selectedPlates).toInt().toString(),
-              style: const TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
+            AnimatedBuilder(
+              animation: _numberAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _numberAnimation.value,
+                  child: Text(
+                    calculateWeightFromPlates(selectedPlates).toInt().toString(),
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -208,7 +248,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ...selectedPlates.reversed.map((w) => buildSmallPlate(w)), // Left side plates
+                    ...selectedPlates.reversed.map((w) => AnimatedPlate(weight: w)), // Left side plates with animation
                     Stack(
                       alignment: Alignment.center,
                       children: [
@@ -223,7 +263,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                         ),
                       ],
                     ),
-                    ...selectedPlates.map((w) => buildSmallPlate(w)), // Right side plates
+                    ...selectedPlates.map((w) => AnimatedPlate(weight: w)), // Right side plates with animation
                   ],
                 ),
               ),
@@ -233,6 +273,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
               onPressed: () {
                 setState(() {
                   selectedPlates.clear(); // Clear all selected plates
+                  _animateNumberChange();
                 });
               },
               style: ElevatedButton.styleFrom(
@@ -260,6 +301,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
                       if (tempInventory[entry.key]! > 0) {
                         selectedPlates.add(entry.key);
                         selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
+                        _animateNumberChange();
                       }
                     });
                   },
@@ -315,30 +357,39 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
 
   Widget buildBarbellDiagram() {
     List<double> plates = getPlatesNeeded();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 30, // Fixed width for the bar
-              height: 30, // Square shape for the bar
-              color: Colors.grey, // Barbell shaft
-            ),
-            Text(
-              barWeight.toStringAsFixed(0), // Display the bar's weight
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-          ],
-        ),
-        ...plates.map((w) => buildPlate(w)), // Show right side weights
-        Container(
-          width: 10, // Short bar sticking out beyond the weights
-          height: 30,
-          color: Colors.grey,
-        ),
-      ],
+
+    return AnimatedBuilder(
+      animation: _numberAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _numberAnimation.value,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 30, // Fixed width for the bar
+                    height: 30, // Square shape for the bar
+                    color: Colors.grey, // Barbell shaft
+                  ),
+                  Text(
+                    barWeight.toStringAsFixed(0), // Display the bar's weight
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
+              ),
+              ...plates.map((w) => AnimatedPlate(weight: w)), // Show right side weights with animation
+              Container(
+                width: 10, // Short bar sticking out beyond the weights
+                height: 30,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -839,6 +890,36 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> {
         ),
       ),
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white, // Toggle background color
+    );
+  }
+}
+
+class AnimatedPlate extends StatelessWidget {
+  final double weight;
+
+  const AnimatedPlate({Key? key, required this.weight}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.symmetric(horizontal: 1),
+      width: 15 + weight / 4, // Smaller width for plates
+      height: 35 + (weight / 45) * 70, // Smaller height for plates
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(2),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        weight % 1 == 0 ? weight.toInt().toString() : weight.toStringAsFixed(1),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: weight == 2.5 ? 14 : 12, // Larger font size for "2.5"
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
