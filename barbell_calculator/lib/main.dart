@@ -370,20 +370,20 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    width: 30, // Fixed width for the bar
-                    height: 30, // Square shape for the bar
+                    width: 40, // Moderately increased width for the bar
+                    height: 40, // Moderately larger square shape for the bar
                     color: Colors.grey, // Barbell shaft
                   ),
                   Text(
                     barWeight.toStringAsFixed(0), // Display the bar's weight
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Slightly larger font size
                   ),
                 ],
               ),
-              ...plates.map((w) => AnimatedPlate(weight: w)), // Show right side weights with animation
+              ...plates.map((w) => buildPlate(w)), // Show right side weights
               Container(
-                width: 10, // Short bar sticking out beyond the weights
-                height: 30,
+                width: 15, // Slightly longer bar sticking out beyond the weights
+                height: 40,
                 color: Colors.grey,
               ),
             ],
@@ -395,20 +395,20 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   Widget buildPlate(double weight) {
     String display = weight % 1 == 0 ? weight.toInt().toString() : weight.toString();
-    double plateHeight = 70 + (weight / 45) * 140; // Larger height for plates
-    double plateWidth = 30 + weight / 2; // Larger width for plates
+    double plateHeight = 80 + (weight / 45) * 160; // Moderately larger height for plates
+    double plateWidth = 30 + weight / 2.5; // Moderately larger width for plates
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 3),
       width: plateWidth,
       height: plateHeight,
       decoration: BoxDecoration(
         color: Colors.blue,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(5),
       ),
       alignment: Alignment.center,
       child: Text(
         display,
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+        style: const TextStyle(color: Colors.white, fontSize: 13), // Slightly larger font size
       ),
     );
   }
