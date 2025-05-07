@@ -267,7 +267,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                         ),
                         Text(
                           barWeight.toStringAsFixed(0), // Display the bar's weight
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
                         ),
                       ],
                     ),
@@ -356,7 +356,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         display,
         style: TextStyle(
           color: Colors.white,
-          fontSize: weight == 2.5 ? 14 : 12, // Larger font size for "2.5"
+          fontSize: 12, 
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -418,7 +418,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         display,
         style: TextStyle(
           color: Colors.white,
-          fontSize: weight == 2.5 ? 10 : 20, // Smaller text for 2.5lb plates
+          fontSize: weight == 2.5 ? 15 : 20, // Smaller text for 2.5lb plates
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -891,7 +891,7 @@ class AnimatedPlate extends StatelessWidget {
         weight % 1 == 0 ? weight.toInt().toString() : weight.toStringAsFixed(1),
         style: TextStyle(
           color: Colors.white,
-          fontSize: weight == 2.5 ? 14 : 12, // Larger font size for "2.5"
+          fontSize: weight == 2.5 ? 8 : 12, // Larger font size for "2.5"
           fontWeight: FontWeight.bold,
         ),
       ),
