@@ -240,7 +240,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 return Transform.scale(
                   scale: _numberAnimation.value,
                   child: Text(
-                    calculateWeightFromPlates(selectedPlates).toInt().toString(),
+                    calculateWeightFromPlates(selectedPlates).toStringAsFixed(0),
                     style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -322,7 +322,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      '${entry.key} lb',
+                      '${entry.key % 1 == 0 ? entry.key.toInt() : entry.key} lb',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
