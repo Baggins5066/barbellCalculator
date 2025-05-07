@@ -155,7 +155,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   void _adjustWeight(double amount) {
     setState(() {
-      weight = (weight + amount).clamp(barWeight, 1000); // Ensure weight does not go below bar weight
+      weight = (weight + amount).clamp(barWeight, 405); // Ensure weight does not exceed 405
       _controller.text = weight.toStringAsFixed(0);
     });
   }
@@ -176,8 +176,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   void _validateAndSetWeight(String value) {
     final newValue = double.tryParse(value);
-    if (newValue == null || newValue < barWeight) {
-      _showErrorMessage('Invalid weight. Please enter a valid number greater than or equal to the bar weight.');
+    if (newValue == null || newValue < barWeight || newValue > 405) {
+      _showErrorMessage('Invalid weight. Please enter a number between $barWeight and 405.');
       _controller.text = weight.toStringAsFixed(0);
       return;
     }
