@@ -416,7 +416,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
       alignment: Alignment.center,
       child: Text(
         display,
-        style: const TextStyle(color: Colors.white, fontSize: 13), // Slightly larger font size
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: weight == 2.5 ? 10 : 20, // Smaller text for 2.5lb plates
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
