@@ -306,7 +306,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      if (tempInventory[entry.key]! > 0) {
+                      if (tempInventory[entry.key]! > 0 && selectedPlates.length < 6) { // Limit to 6 plates
                         selectedPlates.add(entry.key);
                         selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
                         _animateNumberChange();
