@@ -384,7 +384,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                   ),
                   Text(
                     barWeight.toStringAsFixed(0), // Display the bar's weight
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black), // Slightly larger font size
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), // Slightly larger font size
                   ),
                 ],
               ),
