@@ -42,3 +42,7 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("com.google.android.gms:play-services-ads:22.0.0")
+}

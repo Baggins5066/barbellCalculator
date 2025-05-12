@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for setting device orientation
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize(); // Initialize Google Mobile Ads
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp, // Lock to portrait mode
     DeviceOrientation.portraitDown,
@@ -860,6 +862,8 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                     buildElevatedButton(label: '+90', onPressed: () => _adjustWeight(90)),
                   ],
                 ),
+              const SizedBox(height: 20),
+              BannerAdWidget(), // Add the BannerAdWidget to display ads
             ],
           ),
         ),
@@ -895,6 +899,29 @@ class AnimatedPlate extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+    );
+  }
+}
+
+class BannerAdWidget extends StatelessWidget {
+  final BannerAd bannerAd;
+
+  BannerAdWidget({Key? key})
+      : bannerAd = BannerAd(
+          adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Ad Unit ID
+          size: AdSize.banner,
+          request: AdRequest(),
+          listener: BannerAdListener(),
+        )..load(),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      width: bannerAd.size.width.toDouble(),
+      height: bannerAd.size.height.toDouble(),
+      child: AdWidget(ad: bannerAd),
     );
   }
 }
