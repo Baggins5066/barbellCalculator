@@ -782,90 +782,96 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _toggleMode,
-                    icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
-                    label: Text(
-                      isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20), // More rounded edges
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              if (isWeightToPlates) ...[
-                Expanded(
-                  child: Center(
-                    child: buildBarbellDiagram(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _controller,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: _isWeightAchievable ? Colors.white : Colors.red, // Red text if weight is not achievable
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Enter Weight',
-                    labelStyle: const TextStyle(color: Colors.blue),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onChanged: _validateAndSetWeight,
-                ),
-                if (!_isWeightAchievable) // Show error message if weight is not achievable
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      _errorMessage,
-                      style: const TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-              ] else ...[
-                Expanded(
-                  child: buildPlatesSelection(),
-                ),
-              ],
-              const SizedBox(height: 20),
-              if (isWeightToPlates)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
+          children: [
+            BannerAdWidget(), // Move the BannerAdWidget to the top of the screen
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    buildElevatedButton(label: '-90', onPressed: () => _adjustWeight(-90)),
-                    buildElevatedButton(label: '-5', onPressed: () => _adjustWeight(-5)),
-                    buildElevatedButton(label: 'Reset', onPressed: _resetWeight, minWidth: 70),
-                    buildElevatedButton(label: '+5', onPressed: () => _adjustWeight(5)),
-                    buildElevatedButton(label: '+90', onPressed: () => _adjustWeight(90)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _toggleMode,
+                          icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
+                          label: Text(
+                            isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20), // More rounded edges
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    if (isWeightToPlates) ...[
+                      Expanded(
+                        child: Center(
+                          child: buildBarbellDiagram(),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _controller,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: _isWeightAchievable ? Colors.white : Colors.red, // Red text if weight is not achievable
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Enter Weight',
+                          labelStyle: const TextStyle(color: Colors.blue),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onChanged: _validateAndSetWeight,
+                      ),
+                      if (!_isWeightAchievable) // Show error message if weight is not achievable
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            _errorMessage,
+                            style: const TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                    ] else ...[
+                      Expanded(
+                        child: buildPlatesSelection(),
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    if (isWeightToPlates)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          buildElevatedButton(label: '-90', onPressed: () => _adjustWeight(-90)),
+                          buildElevatedButton(label: '-5', onPressed: () => _adjustWeight(-5)),
+                          buildElevatedButton(label: 'Reset', onPressed: _resetWeight, minWidth: 70),
+                          buildElevatedButton(label: '+5', onPressed: () => _adjustWeight(5)),
+                          buildElevatedButton(label: '+90', onPressed: () => _adjustWeight(90)),
+                        ],
+                      ),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              const SizedBox(height: 20),
-              BannerAdWidget(), // Add the BannerAdWidget to display ads
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white, // Toggle background color
