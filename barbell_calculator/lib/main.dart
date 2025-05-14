@@ -600,11 +600,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     return Scaffold(
       key: _scaffoldMessengerKey, // Attach the key to the Scaffold
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(width: 10),
-          ],
+        title: Center(
+          child: Image.asset(
+            'assets/logo.png',
+            height: 40, // Adjust the height as needed
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
