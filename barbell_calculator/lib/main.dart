@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for setting device orientation
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_purchase/in_app_purchase.dart'; // Import for in-app purchases
+import 'package:shared_preferences/shared_preferences.dart'; // Import for saving purchase state
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,9 +90,19 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   late AnimationController _numberAnimationController;
   late Animation<double> _numberAnimation;
 
+  bool _adsRemoved = false; // Track if ads are removed
+
   @override
   void initState() {
     super.initState();
+    _initializePurchaseState();
+    InAppPurchase.instance.purchaseStream.listen((purchases) {
+      for (final purchase in purchases) {
+        if (purchase.status == PurchaseStatus.purchased) {
+          _removeAds();
+        }
+      }
+    });
     _numberAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -110,6 +122,38 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   void dispose() {
     _numberAnimationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializePurchaseState() async {
+    final prefs = await SharedPreferences.getInstance();
+    _adsRemoved = prefs.getBool('adsRemoved') ?? false;
+  }
+
+  Future<void> _removeAds() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('adsRemoved', true);
+    setState(() {
+      _adsRemoved = true;
+    });
+  }
+
+  void _buyRemoveAds() async {
+    final bool available = await InAppPurchase.instance.isAvailable();
+    if (!available) {
+      _showErrorMessage('In-app purchases are not available.');
+      return;
+    }
+
+    const Set<String> _kIds = {'remove_ads'};
+    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
+    if (response.notFoundIDs.isNotEmpty) {
+      _showErrorMessage('Product not found.');
+      return;
+    }
+
+    final ProductDetails productDetails = response.productDetails.first;
+    final PurchaseParam purchaseParam = PurchaseParam(productDetails: productDetails);
+    InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
   void _applyInventoryChanges(Map<double, int> updatedInventory) {
@@ -491,18 +535,21 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                               ),
                             ],
                           ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _adsRemoved
+                                ? null
+                                : () {
+                                    _buyRemoveAds();
+                                  },
+                            child: Text(_adsRemoved ? 'Ads Removed' : 'Remove Ads (\$1.99)'),
+                          ),
                         ],
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Added padding
-                          ),
-                          child: const Text(
-                            'Apply',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // White text
-                          ),
+                          child: const Text('Close'),
                         ),
                       ],
                     );
@@ -793,7 +840,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
       body: SafeArea(
         child: Column(
           children: [
-            BannerAdWidget(), // Move the BannerAdWidget to the top of the screen
+            if (!_adsRemoved) BannerAdWidget(), // Show the BannerAdWidget only if ads are not removed
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
