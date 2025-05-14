@@ -137,6 +137,16 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     });
   }
 
+  Future<void> _restorePurchases() async {
+    final bool available = await InAppPurchase.instance.isAvailable();
+    if (!available) {
+      _showErrorMessage('In-app purchases are not available.');
+      return;
+    }
+
+    await InAppPurchase.instance.restorePurchases();
+  }
+
   void _buyRemoveAds() async {
     final bool available = await InAppPurchase.instance.isAvailable();
     if (!available) {
@@ -543,6 +553,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                                     _buyRemoveAds();
                                   },
                             child: Text(_adsRemoved ? 'Ads Removed' : 'Remove Ads (\$1.99)'),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _restorePurchases,
+                            child: const Text('Restore Purchases'),
                           ),
                         ],
                       ),

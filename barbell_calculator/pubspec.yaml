@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_mobile_ads: ^3.0.0
-  in_app_purchase: ^3.0.0
+  in_app_purchase: ^3.2.2
   shared_preferences: ^2.0.15
 
   # The following adds the Cupertino Icons font to your application.
