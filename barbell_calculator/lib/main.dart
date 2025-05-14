@@ -3,6 +3,7 @@ import 'package:flutter/services.dart'; // Import for setting device orientation
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart'; // Import for in-app purchases
 import 'package:shared_preferences/shared_preferences.dart'; // Import for saving purchase state
+import 'dart:convert'; // Import for JSON encoding and decoding
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,6 +98,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     super.initState();
     _initializePurchaseState();
     _loadDarkModePreference(); // Load dark mode preference on app start
+    _loadPlateInventory(); // Load plate inventory on app start
     InAppPurchase.instance.purchaseStream.listen((purchases) {
       for (final purchase in purchases) {
         if (purchase.status == PurchaseStatus.purchased) {
@@ -180,9 +182,27 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
+  Future<void> _savePlateInventory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final inventoryMap = plateInventory.map((key, value) => MapEntry(key.toString(), value));
+    await prefs.setString('plateInventory', jsonEncode(inventoryMap));
+  }
+
+  Future<void> _loadPlateInventory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final inventoryString = prefs.getString('plateInventory');
+    if (inventoryString != null) {
+      final Map<String, dynamic> inventoryMap = jsonDecode(inventoryString);
+      setState(() {
+        plateInventory = inventoryMap.map((key, value) => MapEntry(double.parse(key), value as int));
+      });
+    }
+  }
+
   void _applyInventoryChanges(Map<double, int> updatedInventory) {
     setState(() {
       plateInventory = Map.from(updatedInventory);
+      _savePlateInventory(); // Save the updated inventory
     });
   }
 
