@@ -99,6 +99,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     _initializePurchaseState();
     _loadDarkModePreference(); // Load dark mode preference on app start
     _loadPlateInventory(); // Load plate inventory on app start
+    _loadBarWeight(); // Load bar weight on app start
     InAppPurchase.instance.purchaseStream.listen((purchases) {
       for (final purchase in purchases) {
         if (purchase.status == PurchaseStatus.purchased) {
@@ -125,6 +126,18 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   void dispose() {
     _numberAnimationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveBarWeight() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('barWeight', barWeight);
+  }
+
+  Future<void> _loadBarWeight() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      barWeight = prefs.getDouble('barWeight') ?? 45.0; // Default to 45.0 if not set
+    });
   }
 
   Future<void> _initializePurchaseState() async {
@@ -309,6 +322,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   void _animateNumberChange() {
     _numberAnimationController.forward();
+  }
+
+  void _updateBarWeight(double newBarWeight) {
+    setState(() {
+      barWeight = newBarWeight;
+      weight = barWeight; // Reset target weight to new bar weight
+      _controller.text = barWeight.toStringAsFixed(0);
+      _saveBarWeight(); // Save the updated bar weight
+    });
   }
 
   List<double> getPlatesNeeded() {
@@ -673,11 +695,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                         onPressed: () {
                           final newBarWeight = int.tryParse(barWeightController.text);
                           if (newBarWeight != null && newBarWeight > 0) {
-                            setState(() {
-                              barWeight = newBarWeight.toDouble();
-                              weight = barWeight; // Reset target weight to new bar weight
-                              _controller.text = barWeight.toStringAsFixed(0);
-                            });
+                            _updateBarWeight(newBarWeight.toDouble());
                             Navigator.of(context).pop();
                           } else {
                             _showErrorMessage('Invalid weight. Please enter a positive integer.');
