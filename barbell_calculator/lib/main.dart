@@ -315,12 +315,21 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                       }
                     });
                   },
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
                     height: 80,
                     width: 80,
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.5),
+                          blurRadius: 10,
+                          spreadRadius: selectedPlates.contains(entry.key) ? 5 : 0, // Highlight selected plates
+                        ),
+                      ],
                     ),
                     alignment: Alignment.center,
                     child: Text(
