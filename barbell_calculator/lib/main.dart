@@ -96,6 +96,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   void initState() {
     super.initState();
     _initializePurchaseState();
+    _loadDarkModePreference(); // Load dark mode preference on app start
     InAppPurchase.instance.purchaseStream.listen((purchases) {
       for (final purchase in purchases) {
         if (purchase.status == PurchaseStatus.purchased) {
@@ -127,6 +128,19 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   Future<void> _initializePurchaseState() async {
     final prefs = await SharedPreferences.getInstance();
     _adsRemoved = prefs.getBool('adsRemoved') ?? false;
+  }
+
+  Future<void> _loadDarkModePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? true; // Default to true (dark mode)
+      _applyTheme();
+    });
+  }
+
+  Future<void> _saveDarkModePreference(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', value);
   }
 
   Future<void> _removeAds() async {
@@ -172,34 +186,67 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     });
   }
 
+  void _applyTheme() {
+    final theme = isDarkMode
+        ? ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: Colors.grey[900],
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF212121),
+              foregroundColor: Colors.blue,
+              iconTheme: IconThemeData(color: Colors.blue),
+              titleTextStyle: TextStyle(color: Colors.blue, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            inputDecorationTheme: const InputDecorationTheme(
+              fillColor: Color(0xFF212121),
+              filled: true,
+              border: OutlineInputBorder(),
+              hintStyle: TextStyle(color: Colors.white70),
+            ),
+            dialogBackgroundColor: Colors.grey[850],
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white),
+            ),
+          )
+        : ThemeData(
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              iconTheme: IconThemeData(color: Colors.black),
+              titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            inputDecorationTheme: const InputDecorationTheme(
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(),
+              hintStyle: TextStyle(color: Colors.black54),
+            ),
+            dialogBackgroundColor: Colors.white,
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.black),
+              bodyMedium: TextStyle(color: Colors.black),
+            ),
+          );
+
+    setState(() {
+      Theme.of(context).copyWith(
+        scaffoldBackgroundColor: theme.scaffoldBackgroundColor,
+        appBarTheme: theme.appBarTheme,
+        inputDecorationTheme: theme.inputDecorationTheme,
+        dialogBackgroundColor: theme.dialogBackgroundColor,
+        textTheme: theme.textTheme,
+      );
+    });
+  }
+
   void _toggleDarkMode(bool value) {
     setState(() {
       isDarkMode = value;
-      if (isDarkMode) {
-        // Apply dark mode colors
-        Theme.of(context).copyWith(
-          scaffoldBackgroundColor: Colors.grey[900],
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFF212121),
-            foregroundColor: Colors.blue,
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            fillColor: Color(0xFF212121),
-          ),
-        );
-      } else {
-        // Apply light mode colors
-        Theme.of(context).copyWith(
-          scaffoldBackgroundColor: Colors.white,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.blue,
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            fillColor: Colors.white,
-          ),
-        );
-      }
+      _applyTheme();
+      _saveDarkModePreference(value); // Save the preference
     });
   }
 
