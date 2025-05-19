@@ -4,6 +4,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart'; // Import for in-app purchases
 import 'package:shared_preferences/shared_preferences.dart'; // Import for saving purchase state
 import 'dart:convert'; // Import for JSON encoding and decoding
+import 'package:url_launcher/url_launcher.dart'; // Import for launching URLs
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -698,6 +699,18 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                             onPressed: _restorePurchases,
                             child: const Text('Restore Purchases'),
                           ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () async {
+                              const url = 'https://occipital-hub-fe2.notion.site/Privacy-Policy-for-Barbell-Calculator-1f881eaa537580b997e3f04b4e8795dd?pvs=4';
+                              if (await canLaunchUrl(Uri.parse(url))) {
+                                await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                              } else {
+                                _showErrorMessage('Could not open privacy policy.');
+                              }
+                            },
+                            child: const Text('Privacy Policy'),
+                          ),
                         ],
                       ),
                       actions: [
@@ -1147,7 +1160,7 @@ class BannerAdWidget extends StatelessWidget {
 
   BannerAdWidget({Key? key})
       : bannerAd = BannerAd(
-          adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Ad Unit ID
+          adUnitId: 'ca-app-pub-7664311233392669/6589593490', 
           size: AdSize.banner,
           request: AdRequest(),
           listener: BannerAdListener(),
