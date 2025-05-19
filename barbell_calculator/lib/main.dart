@@ -996,7 +996,6 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
       body: SafeArea(
         child: Column(
           children: [
-            if (!_adsRemoved) BannerAdWidget(), // Show the BannerAdWidget only if ads are not removed
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -1008,9 +1007,9 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                       children: [
                         ElevatedButton.icon(
                           onPressed: _toggleMode,
-                          icon: const Icon(Icons.swap_horiz, size: 30), // Icon for mode toggle
+                          icon: const Icon(Icons.swap_horiz, size: 30),
                           label: Text(
-                            isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight', // Dynamic title
+                            isWeightToPlates ? 'Weight → Plates' : 'Plates → Weight',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -1020,7 +1019,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             backgroundColor: Colors.blue,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20), // More rounded edges
+                              borderRadius: BorderRadius.circular(20),
                             ),
                           ),
                         ),
@@ -1044,7 +1043,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          color: _isWeightAchievable ? Colors.white : Colors.red, // Red text if weight is not achievable
+                          color: _isWeightAchievable ? Colors.white : Colors.red,
                         ),
                         decoration: InputDecoration(
                           labelText: 'Enter Weight',
@@ -1073,7 +1072,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                         ),
                         onChanged: _validateAndSetWeight,
                       ),
-                      if (!_isWeightAchievable) // Show error message if weight is not achievable
+                      if (!_isWeightAchievable)
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
@@ -1104,6 +1103,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 ),
               ),
             ),
+            if (!_adsRemoved) BannerAdWidget(),
           ],
         ),
       ),
