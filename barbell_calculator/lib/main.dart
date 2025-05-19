@@ -284,12 +284,14 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   }
 
   void _toggleMode() {
+    HapticFeedback.lightImpact(); // Add haptic feedback
     setState(() {
       isWeightToPlates = !isWeightToPlates;
     });
   }
 
   void _adjustWeight(double amount) {
+    HapticFeedback.mediumImpact(); // Add haptic feedback
     setState(() {
       weight = (weight + amount).clamp(barWeight, 405); // Ensure weight does not exceed 405
       _controller.text = weight.toStringAsFixed(0);
@@ -297,6 +299,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
   }
 
   void _resetWeight() {
+    HapticFeedback.lightImpact(); // Add haptic feedback
     setState(() {
       weight = barWeight; // Reset target weight to barbell weight
       _controller.text = barWeight.toStringAsFixed(0);
@@ -424,6 +427,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
+                HapticFeedback.mediumImpact(); // Add haptic feedback for reset in plates -> weight mode
                 setState(() {
                   selectedPlates.clear(); // Clear all selected plates
                   _animateNumberChange();
@@ -454,6 +458,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                       if (tempInventory[entry.key]! > 0 && selectedPlates.length < 6) { // Limit to 6 plates
                         selectedPlates.add(entry.key);
                         selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
+                        HapticFeedback.lightImpact(); // Add haptic feedback when plate is added
                         _animateNumberChange();
                       }
                     });
