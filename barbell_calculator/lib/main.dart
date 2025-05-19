@@ -600,15 +600,27 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     return Scaffold(
       key: _scaffoldMessengerKey, // Attach the key to the Scaffold
       appBar: AppBar(
-        title: Center(
-          child: Image.asset(
-            'assets/logo.png',
-            height: 40, // Adjust the height as needed
-          ),
+        centerTitle: false, // Remove centerTitle
+        title: const SizedBox.shrink(), // Remove the default title
+        flexibleSpace: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 56, // (AppBar height 56 - logo height 40) / 2
+                  child: Image.asset(
+                    'assets/logo.png',
+                    height: 40,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.settings, size: 30), // Increased icon size
+          icon: const Icon(Icons.settings, size: 30),
           tooltip: 'Open Settings',
           onPressed: () {
             showDialog(
