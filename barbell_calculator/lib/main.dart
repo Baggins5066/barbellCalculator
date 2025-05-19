@@ -12,57 +12,101 @@ void main() {
     DeviceOrientation.portraitUp, // Lock to portrait mode
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(const BarbellCalculatorApp());
+    runApp(BarbellCalculatorApp());
   });
 }
 
 class BarbellCalculatorApp extends StatelessWidget {
-  const BarbellCalculatorApp({super.key});
+  BarbellCalculatorApp({super.key});
+
+  final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.dark);
+
+  final ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: Colors.grey[900],
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF212121),
+      secondary: Colors.blue,
+    ),
+    scaffoldBackgroundColor: Colors.grey[900],
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF212121),
+      foregroundColor: Colors.blue,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+    ),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      filled: true,
+      fillColor: Color(0xFF212121),
+      border: OutlineInputBorder(),
+      labelStyle: TextStyle(color: Colors.blue),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.all(Colors.blue),
+      trackColor: WidgetStateProperty.all(Colors.blue.withOpacity(0.5)),
+    ),
+  );
+
+  final ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: Colors.white,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+      iconTheme: IconThemeData(color: Colors.black),
+      titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      fillColor: Colors.white,
+      filled: true,
+      border: OutlineInputBorder(),
+      hintStyle: TextStyle(color: Colors.black54),
+    ),
+    dialogBackgroundColor: Colors.white,
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.black),
+      bodyMedium: TextStyle(color: Colors.black),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.all(Colors.blue),
+      trackColor: WidgetStateProperty.all(Colors.blue.withOpacity(0.5)),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark, // Dark theme
-        primaryColor: Colors.grey[900], // Dark grey as main color
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF212121), // Dark grey
-          secondary: Colors.blue, // Accent color
-        ),
-        scaffoldBackgroundColor: Colors.grey[900], // Dark grey background
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF212121), // Dark grey AppBar background
-          foregroundColor: Colors.blue, // AppBar text/icon color
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue, // Button background
-            foregroundColor: Colors.white, // Button text color
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeModeNotifier,
+      builder: (context, mode, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: darkTheme,
+          darkTheme: darkTheme,
+          themeMode: mode,
+          home: BarbellCalculatorHome(
+            onThemeChanged: (isDark) {
+              themeModeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
+            },
+            getIsDarkMode: () => themeModeNotifier.value == ThemeMode.dark,
           ),
-        ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white), // Default text color
-          bodyMedium: TextStyle(color: Colors.white),
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          filled: true,
-          fillColor: Color(0xFF212121), // Dark grey fill color
-          border: OutlineInputBorder(),
-          labelStyle: TextStyle(color: Colors.blue), // Label color
-        ),
-        switchTheme: SwitchThemeData(
-          thumbColor: WidgetStateProperty.all(Colors.blue), // Switch thumb color
-          trackColor: WidgetStateProperty.all(Colors.blue.withOpacity(0.5)), // Switch track color
-        ),
-      ),
-      home: const BarbellCalculatorHome(),
+        );
+      },
     );
   }
 }
 
 class BarbellCalculatorHome extends StatefulWidget {
-  const BarbellCalculatorHome({super.key});
+  final void Function(bool isDark) onThemeChanged;
+  final bool Function() getIsDarkMode;
+  const BarbellCalculatorHome({super.key, required this.onThemeChanged, required this.getIsDarkMode});
 
   @override
   State<BarbellCalculatorHome> createState() => _BarbellCalculatorHomeState();
@@ -149,7 +193,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       isDarkMode = prefs.getBool('isDarkMode') ?? true; // Default to true (dark mode)
-      _applyTheme();
+      widget.onThemeChanged(isDarkMode);
     });
   }
 
@@ -219,66 +263,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     });
   }
 
-  void _applyTheme() {
-    final theme = isDarkMode
-        ? ThemeData(
-            brightness: Brightness.dark,
-            scaffoldBackgroundColor: Colors.grey[900],
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF212121),
-              foregroundColor: Colors.blue,
-              iconTheme: IconThemeData(color: Colors.blue),
-              titleTextStyle: TextStyle(color: Colors.blue, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              fillColor: Color(0xFF212121),
-              filled: true,
-              border: OutlineInputBorder(),
-              hintStyle: TextStyle(color: Colors.white70),
-            ),
-            dialogBackgroundColor: Colors.grey[850],
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(color: Colors.white),
-              bodyMedium: TextStyle(color: Colors.white),
-            ),
-          )
-        : ThemeData(
-            brightness: Brightness.light,
-            scaffoldBackgroundColor: Colors.white,
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              iconTheme: IconThemeData(color: Colors.black),
-              titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              fillColor: Colors.white,
-              filled: true,
-              border: OutlineInputBorder(),
-              hintStyle: TextStyle(color: Colors.black54),
-            ),
-            dialogBackgroundColor: Colors.white,
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(color: Colors.black),
-              bodyMedium: TextStyle(color: Colors.black),
-            ),
-          );
-
-    setState(() {
-      Theme.of(context).copyWith(
-        scaffoldBackgroundColor: theme.scaffoldBackgroundColor,
-        appBarTheme: theme.appBarTheme,
-        inputDecorationTheme: theme.inputDecorationTheme,
-        dialogBackgroundColor: theme.dialogBackgroundColor,
-        textTheme: theme.textTheme,
-      );
-    });
-  }
-
   void _toggleDarkMode(bool value) {
     setState(() {
       isDarkMode = value;
-      _applyTheme();
+      widget.onThemeChanged(value);
       _saveDarkModePreference(value); // Save the preference
     });
   }
@@ -694,7 +682,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                     title: const Text('Set Barbell Weight'),
                     content: TextField(
                       controller: barWeightController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^[0-9]*\.?[0-9]*')),
+                      ],
                       decoration: const InputDecoration(
                         labelText: 'Barbell Weight',
                         border: OutlineInputBorder(),
@@ -809,7 +800,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                               Expanded(
                                 child: TextField(
                                   controller: customWeightController,
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^[0-9]*\.?[0-9]*')),
+                                  ],
                                   decoration: const InputDecoration(
                                     labelText: 'Add another',
                                     border: OutlineInputBorder(),
@@ -997,7 +991,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                       const SizedBox(height: 20),
                       TextField(
                         controller: _controller,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^[0-9]*\.?[0-9]*')),
+                        ],
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 36,
@@ -1009,6 +1006,24 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                           labelStyle: const TextStyle(color: Colors.blue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: !_isWeightAchievable ? Colors.red : Colors.blue,
+                              width: 2,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: !_isWeightAchievable ? Colors.red : Colors.blue,
+                              width: 2,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: !_isWeightAchievable ? Colors.red : Colors.blue,
+                              width: 2,
+                            ),
                           ),
                         ),
                         onChanged: _validateAndSetWeight,
