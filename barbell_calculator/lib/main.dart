@@ -653,7 +653,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Close'),
+                          child: const Text('Close', style: TextStyle(fontSize: 18, color: Colors.white)),
                         ),
                       ],
                     );
