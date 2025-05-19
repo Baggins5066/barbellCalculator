@@ -137,6 +137,9 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
 
   bool _adsRemoved = false; // Track if ads are removed
 
+  // --- FIX: Move selectedPlates to state ---
+  List<double> selectedPlates = [];
+
   @override
   void initState() {
     super.initState();
@@ -361,128 +364,170 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
     return totalWeight;
   }
 
-  Widget buildPlatesSelection() {
+  Widget buildPlatesSelection({int? maxPlates}) {
     Map<double, int> tempInventory = Map.from(plateInventory);
-    List<double> selectedPlates = [];
+    // Use the stateful selectedPlates
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Column(
-          children: [
-            const SizedBox(height: 20),
-            AnimatedBuilder(
-              animation: _numberAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _numberAnimation.value,
-                  child: Text(
-                    calculateWeightFromPlates(selectedPlates).toStringAsFixed(0),
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+    // Calculate available plates for selection (subtract already selected)
+    Map<double, int> availableInventory = Map.from(tempInventory);
+    for (var plate in selectedPlates) {
+      if (availableInventory.containsKey(plate) && availableInventory[plate]! > 0) {
+        availableInventory[plate] = availableInventory[plate]! - 1;
+      }
+    }
+
+    // Determine the effective maxPlates (default to unlimited if not provided)
+    int effectiveMaxPlates = maxPlates ?? 1000;
+
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        AnimatedBuilder(
+          animation: _numberAnimation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _numberAnimation.value,
+              child: Text(
+                calculateWeightFromPlates(selectedPlates).toStringAsFixed(0),
+                style: const TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double availableWidth = constraints.maxWidth;
+              final int leftCount = selectedPlates.length;
+              // Calculate left/right padding to center the bar
+              final double plateWidth = 15 + 45 / 4; // Max width for a plate
+              final double barWidth = 20;
+              final double sidePadding = ((availableWidth - barWidth) / 2) - (leftCount * plateWidth);
+              return Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: sidePadding > 0 ? sidePadding : 0,
                     ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ...selectedPlates.reversed.map((w) => AnimatedPlate(weight: w)), // Left side plates with animation
-                    Stack(
-                      alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 20, // Smaller width for the bar
-                          height: 20, // Smaller square shape for the bar
-                          color: Colors.grey, // Barbell shaft
+                        ...selectedPlates.reversed.map((w) => AnimatedPlate(weight: w)),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey,
+                            ),
+                            Text(
+                              barWeight.toStringAsFixed(0),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                            ),
+                          ],
                         ),
-                        Text(
-                          barWeight.toStringAsFixed(0), // Display the bar's weight
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black), // Larger font size
-                        ),
+                        ...selectedPlates.map((w) => AnimatedPlate(weight: w)),
                       ],
                     ),
-                    ...selectedPlates.map((w) => AnimatedPlate(weight: w)), // Right side plates with animation
-                  ],
+                  ),
                 ),
-              ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () {
+            HapticFeedback.mediumImpact(); // Add haptic feedback for reset in plates -> weight mode
+            setState(() {
+              selectedPlates.clear(); // Clear all selected plates
+              _animateNumberChange();
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(120, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                HapticFeedback.mediumImpact(); // Add haptic feedback for reset in plates -> weight mode
-                setState(() {
-                  selectedPlates.clear(); // Clear all selected plates
-                  _animateNumberChange();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(120, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Reset',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 4, // Display 4 buttons per row
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              shrinkWrap: true, // Ensure the grid only takes up necessary space
-              physics: const NeverScrollableScrollPhysics(), // Disable scrolling for the grid
-              children: tempInventory.entries.map((entry) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (tempInventory[entry.key]! > 0 && selectedPlates.length < 6) { // Limit to 6 plates
+          ),
+          child: const Text(
+            'Reset',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        const SizedBox(height: 20),
+        GridView.count(
+          crossAxisCount: 4, // Display 4 buttons per row
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          shrinkWrap: true, // Ensure the grid only takes up necessary space
+          physics: const NeverScrollableScrollPhysics(), // Disable scrolling for the grid
+          children: availableInventory.entries.map((entry) {
+            // Gray out if this plate is unavailable OR if the bar is already max loaded
+            final bool isBarMaxLoaded = selectedPlates.length >= effectiveMaxPlates;
+            final bool isSelected = selectedPlates.contains(entry.key);
+            final bool isAvailable = entry.value > 0 && (!isBarMaxLoaded || isSelected);
+            return GestureDetector(
+              onTap: isAvailable && !isBarMaxLoaded
+                  ? () {
+                      setState(() {
                         selectedPlates.add(entry.key);
                         selectedPlates.sort((a, b) => b.compareTo(a)); // Sort plates by size
                         HapticFeedback.lightImpact(); // Add haptic feedback when plate is added
                         _animateNumberChange();
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.5),
-                          blurRadius: 10,
-                          spreadRadius: selectedPlates.contains(entry.key) ? 5 : 0, // Highlight selected plates
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${entry.key % 1 == 0 ? entry.key.toInt() : entry.key} lb',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                      });
+                    }
+                  : null,
+              onLongPress: isSelected
+                  ? () {
+                      setState(() {
+                        // Remove the last occurrence of this plate if present
+                        int idx = selectedPlates.lastIndexOf(entry.key);
+                        if (idx != -1) {
+                          selectedPlates.removeAt(idx);
+                          _animateNumberChange();
+                        }
+                      });
+                    }
+                  : null,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: isAvailable ? Colors.blue : Colors.grey[700],
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    if (isAvailable)
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: isSelected ? 5 : 0, // Highlight selected plates
                       ),
-                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${entry.key % 1 == 0 ? entry.key.toInt() : entry.key} lb',
+                  style: TextStyle(
+                    color: isAvailable ? Colors.white : Colors.white54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
-                );
-              }).toList(),
-            ),
-          ],
-        );
-      },
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -1039,7 +1084,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                         ),
                     ] else ...[
                       Expanded(
-                        child: buildPlatesSelection(),
+                        child: buildPlatesSelection(maxPlates: 12),
                       ),
                     ],
                     const SizedBox(height: 20),
