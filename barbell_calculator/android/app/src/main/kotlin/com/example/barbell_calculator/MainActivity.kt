@@ -1,4 +1,4 @@
-package com.example.barbell_calculator
+package com.jasper.barbell_calculator
 
 import io.flutter.embedding.android.FlutterActivity
 
