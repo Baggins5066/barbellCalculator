@@ -648,7 +648,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome> with Sing
                 Positioned(
                   left: 0,
                   right: 0,
-                  top: 56, // (AppBar height 56 - logo height 40) / 2
+                  top: constraints.maxHeight - 45, // Lift logo up by 5 pixels
                   child: Image.asset(
                     'assets/logo.png',
                     height: 40,
