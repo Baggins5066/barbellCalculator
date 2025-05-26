@@ -648,17 +648,34 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
-                            onPressed: _adsRemoved
-                                ? null
-                                : () {
-                                  _buyRemoveAds();
-                                },
-                            child: Text(_adsRemoved ? 'Ads Removed' : 'Remove Ads (\$1.99)'),
+                            onPressed:
+                                _adsRemoved
+                                    ? null
+                                    : () {
+                                      _buyRemoveAds();
+                                    },
+                            child: _adsRemoved
+                                ? const Text('Ads Removed')
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.block_flipped, color: Colors.white),
+                                      SizedBox(width: 8),
+                                      Text('Remove Ads (\$1.99)'),
+                                    ],
+                                  ),
                           ),
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: _restorePurchases,
-                            child: const Text('Restore Purchases'),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.cloud_download, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text('Restore Purchases'),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 20),
                           ElevatedButton(
@@ -676,7 +693,14 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                                 );
                               }
                             },
-                            child: const Text('Privacy Policy'),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.policy, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text('Privacy Policy'),
+                              ],
+                            ),
                           ),
                         ],
                       ),
