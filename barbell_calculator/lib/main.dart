@@ -1138,17 +1138,39 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                         ElevatedButton.icon(
                           onPressed: _toggleMode,
                           icon: const Icon(Icons.swap_horiz, size: 30),
-                          label: Text(
-                            isWeightToPlates
-                                ? 'Weight → Plates'
-                                : 'Plates → Weight',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          label: isWeightToPlates
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Weight', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    const SizedBox(width: 6),
+                                    const Icon(Icons.arrow_forward, size: 24, color: Colors.white),
+                                    const SizedBox(width: 6),
+                                    Text('Plates', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Plates', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    const SizedBox(width: 6),
+                                    const Icon(Icons.arrow_forward, size: 24, color: Colors.white),
+                                    const SizedBox(width: 6),
+                                    Text('Weight', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ],
+                                ),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
