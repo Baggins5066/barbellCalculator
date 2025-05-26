@@ -5,6 +5,7 @@ import 'package:in_app_purchase/in_app_purchase.dart'; // Import for in-app purc
 import 'package:shared_preferences/shared_preferences.dart'; // Import for saving purchase state
 import 'dart:convert'; // Import for JSON encoding and decoding
 import 'package:url_launcher/url_launcher.dart'; // Import for launching URLs
+import 'dart:async'; // Import for StreamSubscription
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,18 +98,16 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   // --- FIX: Move selectedPlates to state ---
   List<double> selectedPlates = [];
 
+  late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
+
   @override
   void initState() {
     super.initState();
     _initializePurchaseState();
     _loadPlateInventory(); // Load plate inventory on app start
     _loadBarWeight(); // Load bar weight on app start
-    InAppPurchase.instance.purchaseStream.listen((purchases) {
-      for (final purchase in purchases) {
-        if (purchase.status == PurchaseStatus.purchased) {
-          _removeAds();
-        }
-      }
+    _purchaseSubscription = InAppPurchase.instance.purchaseStream.listen((purchases) {
+      _listenToPurchaseUpdated(purchases);
     });
     _numberAnimationController = AnimationController(
       vsync: this,
@@ -130,6 +129,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   @override
   void dispose() {
     _numberAnimationController.dispose();
+    _purchaseSubscription.cancel();
     super.dispose();
   }
 
@@ -169,6 +169,20 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
     await InAppPurchase.instance.restorePurchases();
   }
 
+  void _listenToPurchaseUpdated(List<PurchaseDetails> purchases) async {
+    for (final purchase in purchases) {
+      if (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored) {
+        // Verify purchase here if needed
+        if (!purchase.pendingCompletePurchase) {
+          await InAppPurchase.instance.completePurchase(purchase);
+        }
+        await _removeAds();
+      } else if (purchase.status == PurchaseStatus.error) {
+        _showErrorMessage('Purchase failed: \\${purchase.error?.message ?? 'Unknown error'}');
+      }
+    }
+  }
+
   void _buyRemoveAds() async {
     final bool available = await InAppPurchase.instance.isAvailable();
     if (!available) {
@@ -177,8 +191,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
     }
 
     const Set<String> _kIds = {'remove_ads'};
-    final ProductDetailsResponse response = await InAppPurchase.instance
-        .queryProductDetails(_kIds);
+    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
       _showErrorMessage('Product not found.');
       return;
@@ -188,7 +201,11 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
     final PurchaseParam purchaseParam = PurchaseParam(
       productDetails: productDetails,
     );
-    InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    try {
+      InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+    } catch (e) {
+      _showErrorMessage('Purchase failed: \\${e.toString()}');
+    }
   }
 
   Future<void> _savePlateInventory() async {
