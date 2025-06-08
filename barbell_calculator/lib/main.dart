@@ -6,16 +6,21 @@ import 'package:shared_preferences/shared_preferences.dart'; // Import for savin
 import 'dart:convert'; // Import for JSON encoding and decoding
 import 'package:url_launcher/url_launcher.dart'; // Import for launching URLs
 import 'dart:async'; // Import for StreamSubscription
+import 'package:flutter/foundation.dart'; // For kIsWeb
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize(); // Initialize Google Mobile Ads
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp, // Lock to portrait mode
-    DeviceOrientation.portraitDown,
-  ]).then((_) {
+  if (!kIsWeb) {
+    MobileAds.instance.initialize(); // Only on mobile
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]).then((_) {
+      runApp(BarbellCalculatorApp());
+    });
+  } else {
     runApp(BarbellCalculatorApp());
-  });
+  }
 }
 
 class BarbellCalculatorApp extends StatelessWidget {
@@ -237,14 +242,14 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   }
 
   void _toggleMode() {
-    HapticFeedback.lightImpact(); // Add haptic feedback
+    if (!kIsWeb) HapticFeedback.lightImpact(); // Only on mobile
     setState(() {
       isWeightToPlates = !isWeightToPlates;
     });
   }
 
   void _adjustWeight(double amount) {
-    HapticFeedback.mediumImpact(); // Add haptic feedback
+    if (!kIsWeb) HapticFeedback.mediumImpact(); // Only on mobile
     setState(() {
       weight = (weight + amount).clamp(
         barWeight,
@@ -255,7 +260,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   }
 
   void _resetWeight() {
-    HapticFeedback.lightImpact(); // Add haptic feedback
+    if (!kIsWeb) HapticFeedback.lightImpact(); // Only on mobile
     setState(() {
       weight = barWeight; // Reset target weight to barbell weight
       _controller.text = barWeight.toStringAsFixed(0);
@@ -424,9 +429,9 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () {
-            HapticFeedback.mediumImpact(); // Add haptic feedback for reset in plates -> weight mode
+            if (!kIsWeb) HapticFeedback.mediumImpact(); // Only on mobile
             setState(() {
-              selectedPlates.clear(); // Clear all selected plates
+              selectedPlates.clear();
               _animateNumberChange();
             });
           },
@@ -632,7 +637,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldMessengerKey, // Attach the key to the Scaffold
+      key: _scaffoldMessengerKey,
       appBar: AppBar(
         centerTitle: false, // Remove centerTitle
         title: const SizedBox.shrink(), // Remove the default title
@@ -664,37 +669,34 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ElevatedButton(
-                            onPressed:
-                                _adsRemoved
-                                    ? null
-                                    : () {
-                                      _buyRemoveAds();
-                                    },
-                            child: _adsRemoved
-                                ? const Text('Ads Removed')
-                                : Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.block_flipped, color: Colors.white),
-                                      SizedBox(width: 8),
-                                      Text('Remove Ads (\$1.99)'),
-                                    ],
-                                  ),
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: _restorePurchases,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(Icons.cloud_download, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text('Restore Purchases'),
-                              ],
+                          if (!kIsWeb) ...[
+                            ElevatedButton(
+                              onPressed: _adsRemoved ? null : () { _buyRemoveAds(); },
+                              child: _adsRemoved
+                                  ? const Text('Ads Removed')
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Icon(Icons.block_flipped, color: Colors.white),
+                                        SizedBox(width: 8),
+                                        Text('Remove Ads (\$1.99)'),
+                                      ],
+                                    ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _restorePurchases,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.cloud_download, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text('Restore Purchases'),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                           ElevatedButton(
                             onPressed: () async {
                               const url =
@@ -1307,7 +1309,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                 ),
               ),
             ),
-            if (!_adsRemoved) BannerAdWidget(),
+            if (!_adsRemoved && !kIsWeb) BannerAdWidget(),
           ],
         ),
       ),
