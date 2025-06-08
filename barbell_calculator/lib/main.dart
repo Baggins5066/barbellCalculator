@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for setting device orientation
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:in_app_purchase/in_app_purchase.dart'; // Import for in-app purchases
 import 'package:shared_preferences/shared_preferences.dart'; // Import for saving purchase state
 import 'dart:convert'; // Import for JSON encoding and decoding
 import 'package:url_launcher/url_launcher.dart'; // Import for launching URLs
 import 'dart:async'; // Import for StreamSubscription
 import 'package:flutter/foundation.dart'; // For kIsWeb
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 
-void main() {
+final bool isMobile = !kIsWeb &&
+    (defaultTargetPlatform == TargetPlatform.android ||
+     defaultTargetPlatform == TargetPlatform.iOS);
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb) {
-    MobileAds.instance.initialize(); // Only on mobile
-    SystemChrome.setPreferredOrientations([
+  if (isMobile) {
+    await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-    ]).then((_) {
-      runApp(BarbellCalculatorApp());
-    });
-  } else {
-    runApp(BarbellCalculatorApp());
+    ]);
   }
+  runApp(BarbellCalculatorApp());
 }
 
 class BarbellCalculatorApp extends StatelessWidget {
@@ -103,7 +102,10 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   // --- FIX: Move selectedPlates to state ---
   List<double> selectedPlates = [];
 
-  late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
+  late final StreamSubscription<dynamic> _purchaseSubscription = const Stream.empty().listen((_) {});
+
+  // Track if the user has dismissed the large window warning in this session
+  bool _largeWindowWarningDismissed = false;
 
   @override
   void initState() {
@@ -111,9 +113,6 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
     _initializePurchaseState();
     _loadPlateInventory(); // Load plate inventory on app start
     _loadBarWeight(); // Load bar weight on app start
-    _purchaseSubscription = InAppPurchase.instance.purchaseStream.listen((purchases) {
-      _listenToPurchaseUpdated(purchases);
-    });
     _numberAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -165,52 +164,15 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
   }
 
   Future<void> _restorePurchases() async {
-    final bool available = await InAppPurchase.instance.isAvailable();
-    if (!available) {
-      _showErrorMessage('In-app purchases are not available.');
-      return;
-    }
-
-    await InAppPurchase.instance.restorePurchases();
+    // Stub for non-mobile platforms
   }
 
-  void _listenToPurchaseUpdated(List<PurchaseDetails> purchases) async {
-    for (final purchase in purchases) {
-      if (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored) {
-        // Verify purchase here if needed
-        if (!purchase.pendingCompletePurchase) {
-          await InAppPurchase.instance.completePurchase(purchase);
-        }
-        await _removeAds();
-      } else if (purchase.status == PurchaseStatus.error) {
-        _showErrorMessage('Purchase failed: \\${purchase.error?.message ?? 'Unknown error'}');
-      }
-    }
+  void _listenToPurchaseUpdated(List<dynamic> purchases) async {
+    // Stub for non-mobile platforms
   }
 
   void _buyRemoveAds() async {
-    final bool available = await InAppPurchase.instance.isAvailable();
-    if (!available) {
-      _showErrorMessage('In-app purchases are not available.');
-      return;
-    }
-
-    const Set<String> _kIds = {'remove_ads'};
-    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
-    if (response.notFoundIDs.isNotEmpty) {
-      _showErrorMessage('Product not found.');
-      return;
-    }
-
-    final ProductDetails productDetails = response.productDetails.first;
-    final PurchaseParam purchaseParam = PurchaseParam(
-      productDetails: productDetails,
-    );
-    try {
-      InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
-    } catch (e) {
-      _showErrorMessage('Purchase failed: \\${e.toString()}');
-    }
+    // Stub for non-mobile platforms
   }
 
   Future<void> _savePlateInventory() async {
@@ -636,6 +598,20 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    // Show the warning if the window is large and not dismissed
+    bool showLargeWindowWarning = width > 600 && !_largeWindowWarningDismissed;
+    // If the window becomes small, reset the dismissed state so the warning can reappear
+    if (width <= 600 && _largeWindowWarningDismissed) {
+      // Use WidgetsBinding to schedule setState after build to avoid build cycle errors
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _largeWindowWarningDismissed = false;
+          });
+        }
+      });
+    }
     return Scaffold(
       key: _scaffoldMessengerKey,
       appBar: AppBar(
@@ -845,19 +821,14 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      ...tempInventory.entries.where((entry) => entry.value > 0).map((
-                                        entry,
-                                      ) {
+                                      ...tempInventory.entries.where((entry) => entry.value > 0).map((entry) {
                                         return Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               entry.key % 1 == 0
                                                   ? entry.key.toInt().toString()
-                                                  : entry.key.toStringAsFixed(
-                                                    1,
-                                                  ), // Display as integer if whole number
+                                                  : entry.key.toStringAsFixed(1),
                                               style: const TextStyle(
                                                 fontSize: 18,
                                               ),
@@ -1145,6 +1116,41 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
       body: SafeArea(
         child: Column(
           children: [
+            if (showLargeWindowWarning)
+              Container(
+                width: double.infinity,
+                color: Colors.amber[800],
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10), // Thinner vertical padding
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning, color: Colors.black, size: 18),
+                    const SizedBox(width: 6),
+                    const Expanded(
+                      child: Text(
+                        'Use a mobile device for the best experience.',
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.black, size: 18),
+                        tooltip: 'Dismiss',
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        onPressed: () {
+                          setState(() {
+                            _largeWindowWarningDismissed = true;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -1309,7 +1315,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                 ),
               ),
             ),
-            if (!_adsRemoved && !kIsWeb) BannerAdWidget(),
+            if (!_adsRemoved && isMobile) BannerAdWidget(),
           ],
         ),
       ),
@@ -1348,25 +1354,10 @@ class AnimatedPlate extends StatelessWidget {
   }
 }
 
-class BannerAdWidget extends StatelessWidget {
-  final BannerAd bannerAd;
-
-  BannerAdWidget({Key? key})
-    : bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-7664311233392669/6589593490',
-        size: AdSize.banner,
-        request: AdRequest(),
-        listener: BannerAdListener(),
-      )..load(),
-      super(key: key);
-
+// Dummy BannerAdWidget for non-mobile platforms
+typedef _BannerAdWidgetBase = StatelessWidget;
+class BannerAdWidget extends _BannerAdWidgetBase {
+  BannerAdWidget({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      width: bannerAd.size.width.toDouble(),
-      height: bannerAd.size.height.toDouble(),
-      child: AdWidget(ad: bannerAd),
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
