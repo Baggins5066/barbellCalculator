@@ -6,6 +6,10 @@ import 'package:url_launcher/url_launcher.dart'; // Import for launching URLs
 import 'dart:async'; // Import for StreamSubscription
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
+// Conditional import for BannerAdWidget
+import 'ads_stub.dart'
+  if (dart.library.html) 'ads_web.dart'
+  if (dart.library.io) 'ads_mobile.dart';
 
 final bool isMobile = !kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.android ||
@@ -89,8 +93,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
 
   bool _isWeightAchievable =
       true; // Flag to track if the target weight is achievable
-  String _errorMessage =
-      ''; // Error message to display when weight is not achievable
+  String _errorMessage = ''; // Error message to display when weight is not achievable
 
   late AnimationController _numberAnimationController;
   late Animation<double> _numberAnimation;
@@ -1315,7 +1318,7 @@ class _BarbellCalculatorHomeState extends State<BarbellCalculatorHome>
                 ),
               ),
             ),
-            if (!_adsRemoved && isMobile) BannerAdWidget(),
+            if (!_adsRemoved) BannerAdWidget(),
           ],
         ),
       ),
@@ -1352,12 +1355,4 @@ class AnimatedPlate extends StatelessWidget {
       ),
     );
   }
-}
-
-// Dummy BannerAdWidget for non-mobile platforms
-typedef _BannerAdWidgetBase = StatelessWidget;
-class BannerAdWidget extends _BannerAdWidgetBase {
-  BannerAdWidget({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
 }
